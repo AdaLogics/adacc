@@ -1,10 +1,6 @@
 BASE=$PWD
 
 install_packages() {
-	# Install dependencies
-
-    # Dependencies we are going to install manually.
-	#		libz3-dev \
 	sudo apt-get update 
 	sudo apt-get install -y \
 			cargo \
@@ -18,17 +14,17 @@ install_packages() {
 			python3-pip \
 			zlib1g-dev 
 	   
-	# && rm -rf /var/lib/apt/lists/*
 	pip3 install lit
 }
 
 get_deps() {
 	echo "Installing deps"
-	git clone https://github.com/eurecom-s3/symcc
+	#git clone https://github.com/eurecom-s3/symcc
 	cd symcc
 	git submodule init
 	git submodule update
 
+    # Build Z3
     cd ${BASE}
     git clone -b z3-4.8.6 https://github.com/Z3Prover/z3.git
     mkdir z3/build 
@@ -37,8 +33,8 @@ get_deps() {
     ninja
     sudo ninja install
 
-	cd ${BASE}
 	# Build AFL.
+	cd ${BASE}
 	git clone -b v2.56b https://github.com/google/AFL.git afl \
 		&& cd afl \
 		&& make
@@ -54,8 +50,6 @@ get_deps() {
 install_symcc() {
 	echo "Installing SymCC"
 	# Build a version of SymCC with the simple backend to compile libc++
-	#COPY . /symcc_source
-	#WORKDIR /symcc_build_simple
 	mkdir symcc_build
 	cd symcc_build
 	cmake -G Ninja \
@@ -63,7 +57,6 @@ install_symcc() {
 			-DCMAKE_BUILD_TYPE=RelWithDebInfo -DZ3_TRUST_SYSTEM_VERSION=on \
 			../symcc
     ninja check
-	#-DZ3_DIR=/home/dav/symcc-project/symcc/runtime/qsym_backend/qsym/third_party/z3/build/ -DLLVM_DIR=/home/dav/symcc-project/llvm_source \
 
 	# Build SymCC with the Qsym backend
 	cd ${BASE}
@@ -74,10 +67,7 @@ install_symcc() {
 			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 			../symcc 
     ninja check 
-    # -DZ3_DIR=/home/dav/symcc-project/symcc/runtime/qsym_backend/qsym/third_party/z3-4/z3/build/cmake/
-    #exit 0
     cargo install --path ../symcc/util/symcc_fuzzing_helper
-
 
 	# Build libc++ with SymCC using the simple backend
     rm -rf libcxx_symcc
