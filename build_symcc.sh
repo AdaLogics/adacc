@@ -20,9 +20,13 @@ install_packages() {
 get_deps() {
 	echo "Installing deps"
 	#git clone https://github.com/eurecom-s3/symcc
-	cd symcc
-	git submodule init
-	git submodule update
+	cd symcc/runtime/qsym_backend
+    git clone https://github.com/AdaLogics/qsym
+    cd qsym
+    git checkout adalogics
+    
+	#git submodule init
+	#git submodule update
 
     # Build Z3
     cd ${BASE}
