@@ -7,7 +7,6 @@
 int foo(char *arr, int t1) {
     int i = 0;
 
-    printf("Readgin\n");
     if (arr[i++] != 'A') return 0;
     if (arr[i++] != 'B') return 1;
     if (arr[i++] != 'C') return 2;
@@ -29,8 +28,7 @@ int foo(char *arr, int t1) {
     }
 
     // Can we trigger this code? 
-    printf("Goaaaaaal !\n");
-    return 2;
+    return 99;
 }
 
 int main(int argc, char* argv[]) {
@@ -49,6 +47,11 @@ int main(int argc, char* argv[]) {
 
     // pass string to foo
     int retval = foo(string, argc-2);
+    if (retval == 99) {
+        printf("Goaaaaaal!\n");
+    } else {
+        printf("Fail\n");
+    }
 
     free(string);
     return retval;
