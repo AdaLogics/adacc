@@ -79,6 +79,8 @@ std::atomic_flag g_initialized = ATOMIC_FLAG_INIT;
 
 /// The file that contains out input.
 std::string inputFileName;
+std::string current_path = "";
+std::vector<std::string> discovered_paths = {""};
 
 void deleteInputFile() { std::remove(inputFileName.c_str()); }
 
@@ -138,6 +140,22 @@ void _sym_initialize(void) {
     exit(-1);
   }
 
+  if (!g_config.exploredPathsFile.empty()) {
+    std::cerr << "The exploredPathsFile is not empty\n";
+    std::cerr << "Reading explored paths from " << g_config.exploredPathsFile << "\n";
+    std::ifstream infile(g_config.exploredPathsFile);
+    std::string line;
+
+    while (std::getline(infile, line)) {
+      std::cerr << "Read line: " << line << "\n";
+      discovered_paths.push_back(line);
+    }
+
+  }
+  else {
+    std::cerr << "The exploredPathsFile is empty\n";
+  }
+
   // Qsym requires the full input in a file
   if (g_config.inputFile.empty()) {
     std::cerr << "Reading program input until EOF (use Ctrl+D in a terminal)..."
@@ -176,6 +194,33 @@ void _sym_initialize(void) {
       new Solver(inputFileName, g_config.outputDir, g_config.aflCoverageMap);
   g_expr_builder = g_config.pruning ? PruneExprBuilder::create()
                                     : SymbolicExprBuilder::create();
+}
+
+void write_to_file(std::string path_spec) {
+  if (!g_config.exploredPathsFile.empty()) {
+    std::cerr << "The exploredPathsFile is not empty\n";
+    std::cerr << "Writing path to file: " << path_spec << "\n";
+
+
+    ofstream myfile;
+    myfile.open (g_config.exploredPathsFile, ios::app);
+    myfile << path_spec << "\n";
+    myfile.close();
+
+/*
+    std::cerr << "Reading explored paths from " << g_config.exploredPathsFile << "\n";
+    std::ifstream infile(g_config.exploredPathsFile);
+    std::string line;
+
+    while (std::getline(infile, line)) {
+      std::cerr << "Read line: " << line << "\n";
+      discovered_paths.push_back(line);
+    }
+*/
+  }
+  else {
+    std::cerr << "The exploredPathsFile is empty\n";
+  }
 }
 
 SymExpr _sym_build_integer(uint64_t value, uint8_t bits) {
@@ -286,7 +331,33 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   if (constraint == nullptr)
     return;
 
-  g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id);
+  std::cerr << "Pushing path constraint\n";
+  std::string next_path = current_path;
+  if (taken) { 
+      current_path += "1";
+      next_path += "0";
+  }
+  else { 
+      current_path += "0"; 
+      next_path += "1";
+  }
+
+  std::cerr << "Current path: " << current_path << "\n";
+  std::cerr << "Next path: " << next_path << "\n";
+
+  bool should_save = true;
+  if (std::find(discovered_paths.begin(), 
+                discovered_paths.end(),
+                next_path) != discovered_paths.end()) {
+      std::cerr << "Should not save this path\n";
+      // We alreavy have this path, so let's not rediscover it.
+      should_save = false;
+  } else {
+    write_to_file(next_path);
+    write_to_file(current_path);
+  }
+
+  g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
 }
 
 SymExpr _sym_get_input_byte(size_t offset) {
