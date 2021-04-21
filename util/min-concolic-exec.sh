@@ -122,6 +122,9 @@ while true; do
     mv $work_dir/{next,cur}
     mkdir $work_dir/next
 
+    echo "Checking size of symcc output dir"
+    ls -la ${SYMCC_OUTPUT_DIR}
+    echo "done checking"
     # Run it (or wait if there's nothing to run on)
     # Lets cleanup output directory
     rm -rf ${SYMCC_OUTPUT_DIR} && mkdir ${SYMCC_OUTPUT_DIR}

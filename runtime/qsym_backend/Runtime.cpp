@@ -358,6 +358,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   }
 
   g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
+  std::cerr << "Finished push path constraint\n";
 }
 
 SymExpr _sym_get_input_byte(size_t offset) {
