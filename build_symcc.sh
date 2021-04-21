@@ -95,7 +95,7 @@ cleanup() {
     sudo rm -rf ./libcxx_symcc
     sudo rm -rf ./libcxx_symcc_install
     sudo rm -rf ./llvm_source
-    sudo rm -rf ./symcc
+    #sudo rm -rf ./symcc
     sudo rm -rf ./symcc_build
     sudo rm -rf ./symcc_build_qsym
     echo "[+] Done cleaning up"
