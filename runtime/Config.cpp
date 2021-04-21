@@ -53,6 +53,10 @@ void loadConfig() {
   if (inputFile != nullptr)
     g_config.inputFile = inputFile;
 
+  auto *exploredPathsFile = getenv("SYMCC_EXPLORED_PATHS");
+  if (exploredPathsFile != nullptr) 
+      g_config.exploredPathsFile = exploredPathsFile;
+
   auto *logFile = getenv("SYMCC_LOG_FILE");
   if (logFile != nullptr)
     g_config.logFile = logFile;

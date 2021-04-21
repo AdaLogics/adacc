@@ -27,6 +27,9 @@ struct Config {
   /// The input file, if any.
   std::string inputFile;
 
+  // The file with all the already explored paths
+  std::string exploredPathsFile;
+
   /// The file to log constraint solving information to.
   std::string logFile = "";
 
