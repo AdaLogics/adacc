@@ -137,8 +137,8 @@ while true; do
         rm -rf $work_dir/cur
         gen_count=$((gen_count+1))
     else
-        echo "Waiting for more input..."
+        echo "Finished analysis"
         rmdir $work_dir/cur
-        sleep 5
+        break
     fi
 done
