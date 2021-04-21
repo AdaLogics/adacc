@@ -1,4 +1,5 @@
-Ensure you have the correct environment variables set.
+Ensure you have `sym++` in your PATH variable.
+
 ```
 mkdir inp && echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" >> inp/seed1
 
