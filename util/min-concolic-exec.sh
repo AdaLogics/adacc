@@ -131,7 +131,7 @@ while true; do
         for f in $work_dir/cur/*; do
             echo "Running on $f"
             if [[ "$target " =~ " @@ " ]]; then
-                env SYMCC_EXPLORED_PATHS=explored_paths.txt SYMCC_INPUT_FILE=$f $timeout ${target[@]/@@/$f} >/dev/null 2>&1
+                env SYMCC_EXPLORED_PATHS=explored_paths.txt SYMCC_INPUT_FILE=$f $timeout ${target[@]/@@/$f}
             else
                 $timeout $target <$f >/dev/null 2>&1
             fi
