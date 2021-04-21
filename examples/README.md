@@ -32,4 +32,12 @@ We can now run our binary (compiled without symcc instrumentation) on the variou
 ```
 clang ./simple-example.c -o native-simple-example
 find ./outs -type f -exec ./native-simple-example {} \;
+
+...
+Readgin
+Readgin
+Readgin
+Readgin
+Goaaaaaal !
+
 ```
