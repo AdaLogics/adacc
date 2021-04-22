@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 int foo(char *arr, int t1) {
     if (strcmp(arr, "GOAL!") == 0) {
         return 99;
