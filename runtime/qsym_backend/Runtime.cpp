@@ -117,6 +117,10 @@ namespace fs = std::filesystem;
 namespace fs = std::experimental::filesystem;
 #endif
 
+void __dtor_runtime(void) {
+    std::cerr << "dtoring\n";
+}
+
 void _sym_initialize(void) {
   if (g_initialized.test_and_set())
     return;

@@ -105,6 +105,11 @@ SymExpr registerExpression(Z3_ast expr) {
 
 } // namespace
 
+void __dtor_runtime(void) {
+        std::cerr << "dtoring\n";
+}
+
+
 void _sym_initialize(void) {
   if (g_initialized.test_and_set())
     return;

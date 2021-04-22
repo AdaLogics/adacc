@@ -38,6 +38,11 @@ extern "C" {
 void _sym_initialize(void);
 
 /*
+ * Dtor
+ */
+void __dtor_runtime(void);
+
+/*
  * Construction of simple values
  */
 SymExpr _sym_build_integer(uint64_t value, uint8_t bits);

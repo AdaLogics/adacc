@@ -53,6 +53,14 @@ bool SymbolizePass::doInitialization(Module &M) {
       M, kSymCtorName, "_sym_initialize", {}, {});
   appendToGlobalCtors(M, ctor, 0);
 
+  // Add a dtor function for cleaning up paths.
+  IRBuilder<> IRB(M.getContext());
+  Type *void_type = IRB.getVoidTy();
+  FunctionType *FT = FunctionType::get(void_type, void_type, false);
+  Function::Create(FT, Function::ExternalLinkage, "__dtor_runtime", M);
+
+  appendToGlobalDtors(M, M.getFunction("__dtor_runtime"), 0);
+
   return true;
 }
 
