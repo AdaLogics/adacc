@@ -49,3 +49,22 @@ Fail
 Fail
 Fail
 ```
+
+
+## with models
+First build the models in `/models/klee-libc` by 
+```
+cd /models/klee-libc
+./build.sh
+```
+
+This will produce `minilibc.a`
+
+Now you can compile c applications that use a set of functions compiled by symcc:
+
+```
+SYMCC_REGULAR_LIBCXX=1 sym++ strcmp-example.c ../models/klee-libc/minilibc.a -o strcmp-example
+../util/min-concolic-exec.sh -i ./inp -o ./outs ./strcmp-example @@
+...
+...
+```
