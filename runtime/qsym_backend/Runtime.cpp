@@ -350,7 +350,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
                 discovered_paths.end(),
                 next_path) != discovered_paths.end()) {
       std::cerr << "Should not save this path\n";
-      // We alreavy have this path, so let's not rediscover it.
+      // We already have this path, so let's not rediscover it.
       should_save = false;
   } else {
     write_to_file(next_path);
