@@ -30,6 +30,8 @@ struct Config {
   // The file with all the already explored paths
   std::string exploredPathsFile;
 
+  std::string pathModelsFiles;
+
   /// The file to log constraint solving information to.
   std::string logFile = "";
 
