@@ -168,6 +168,7 @@ done
 
 echo "Completed execution"
 total_files=$(ls -l ${out} | wc -l)
-total_paths=$(cat explored_paths.txt | wc -l)
 echo "Total inputs found: ${total_files}"
-echo "Total paths found: ${total_paths}"
+
+total_paths=$(ls -l ${SYMCC_LEGIT_FILES} | wc -l)
+echo "Total unique paths executed: ${total_paths}"
