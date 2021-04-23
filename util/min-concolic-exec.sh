@@ -15,13 +15,16 @@ function usage() {
     echo "initial inputs cover all required input lengths."
 }
 
-while getopts "i:o:" opt; do
+while getopts "i:o:a:" opt; do
     case "$opt" in
         i)
             in=$OPTARG
             ;;
         o)
             out=$OPTARG
+            ;;
+        a) 
+            adir=$OPTARG
             ;;
         *)
             usage
@@ -111,11 +114,15 @@ export SYMCC_ENABLE_LINEARIZATION=1
 # export SYMCC_AFL_COVERAGE_MAP=$work_dir/map
 
 
-rm explored_paths.txt
-touch explored_paths.txt
+rm -rf ${adir}
+mkdir ${adir}
+EXPLORED_PATHS=${adir}/explored_paths.txt
+PATH_MODELS=${adir}/path_models.txt
+SYMCC_LEGIT_FILES=${adir}/legit-files
 
-rm path_models.txt
-touch path_models.txt
+touch ${EXPLORED_PATHS}
+touch ${PATH_MODELS}
+mkdir ${SYMCC_LEGIT_FILES}
 
 # Run generation after generation until we don't generate new inputs anymore
 gen_count=0
@@ -138,7 +145,7 @@ while true; do
             echo "Running on $f"
             if [[ "$target " =~ " @@ " ]]; then
                 #env SYMCC_EXPLORED_PATHS=explored_paths.txt SYMCC_INPUT_FILE=$f $timeout ${target[@]/@@/$f}  >/dev/null 2>&1
-                env SYMCC_PATH_MODELS=path_models.txt SYMCC_EXPLORED_PATHS=explored_paths.txt SYMCC_INPUT_FILE=$f $timeout ${target[@]/@@/$f} 
+                env SYMCC_LEGIT_FILES=${SYMCC_LEGIT_FILES} SYMCC_PATH_MODELS=${PATH_MODELS} SYMCC_EXPLORED_PATHS=${EXPLORED_PATHS} SYMCC_INPUT_FILE=$f $timeout ${target[@]/@@/$f} 
             else
                 $timeout $target <$f >/dev/null 2>&1
             fi

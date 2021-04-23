@@ -32,6 +32,8 @@ struct Config {
 
   std::string pathModelsFiles;
 
+  std::string legitFilesDir;
+
   /// The file to log constraint solving information to.
   std::string logFile = "";
 

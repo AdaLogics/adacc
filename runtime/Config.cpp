@@ -57,6 +57,10 @@ void loadConfig() {
   if (exploredPathsFile != nullptr) 
       g_config.exploredPathsFile = exploredPathsFile;
 
+  auto *legitFilesDir = getenv("SYMCC_LEGIT_FILES");
+  if (legitFilesDir != nullptr)
+      g_config.legitFilesDir = legitFilesDir;
+
   auto *pathModelsFiles = getenv("SYMCC_PATH_MODELS");
   if (pathModelsFiles != nullptr)
       g_config.pathModelsFiles = pathModelsFiles;
