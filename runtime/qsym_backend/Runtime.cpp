@@ -126,8 +126,8 @@ namespace fs = std::experimental::filesystem;
 void write_to_file(std::string path_spec, bool write_to_explored_paths) {
   if (write_to_explored_paths) { 
       if (!g_config.exploredPathsFile.empty()) {
-        std::cerr << "The exploredPathsFile is not empty\n";
-        std::cerr << "Writing path to file: " << path_spec << "\n";
+        //std::cerr << "The exploredPathsFile is not empty\n";
+        //std::cerr << "Writing path to file: " << path_spec << "\n";
 
         ofstream myfile;
         myfile.open (g_config.exploredPathsFile, ios::app);
@@ -135,13 +135,13 @@ void write_to_file(std::string path_spec, bool write_to_explored_paths) {
         myfile.close();
       }
       else {
-        std::cerr << "The exploredPathsFile is empty\n";
+        //std::cerr << "The exploredPathsFile is empty\n";
       }
   }
   else {
       if (!g_config.pathModelsFiles.empty()) {
-        std::cerr << "The pathModelsFiles is not empty\n";
-        std::cerr << "Writing path to file: " << path_spec << "\n";
+        //std::cerr << "The pathModelsFiles is not empty\n";
+        //std::cerr << "Writing path to file: " << path_spec << "\n";
 
         ofstream myfile;
         myfile.open (g_config.pathModelsFiles, ios::app);
@@ -149,7 +149,7 @@ void write_to_file(std::string path_spec, bool write_to_explored_paths) {
         myfile.close();
       }
       else {
-        std::cerr << "The pathModelsFiles is empty\n";
+        //std::cerr << "The pathModelsFiles is empty\n";
       }
 
   }
@@ -157,7 +157,7 @@ void write_to_file(std::string path_spec, bool write_to_explored_paths) {
 
 void __dtor_runtime(void) {
     std::cerr << "dtoring\n";
-    std::cerr << "Current path " << current_path << "\n";
+    //std::cerr << "Current path " << current_path << "\n";
   // check if the next path exists in any of the paths already explored.
     bool should_save = true;
 	//for (std::vector<std::string>::iterator t=discovered_paths.begin(); t!=discovered_paths.end(); ++t) {
@@ -168,20 +168,20 @@ void __dtor_runtime(void) {
 	}
 
     if (should_save) {
-      std::cerr << "Saving this path\n";
+      //std::cerr << "Saving this path\n";
       write_to_file(current_path, true);
       std::string dst = "legit-files/sample-" + discovered_paths.size();
-      std::cerr << "Input filename: " << inputFileName << "\n";
-      std::cerr << "Size4 of input copy: " << my_input_copy.size() << "\n";
+      //std::cerr << "Input filename: " << inputFileName << "\n";
+      //std::cerr << "Size4 of input copy: " << my_input_copy.size() << "\n";
 
       // We do this because we want to ensure we only create files 
       // that are relevant for us. Specifically, we want to ensure
       // we only save files that actually execute a new path and not only models
       // generated.
       if (fs::exists(inputFileName)) {
-        std::cerr << "input file exists\n";
+        //std::cerr << "input file exists\n";
         std::string target_path = "legit-files/sample-" + std::to_string(discovered_paths.size());
-        std::cerr << "Target path: " << target_path << "\n";
+        //std::cerr << "Target path: " << target_path << "\n";
         fs::copy(inputFileName, target_path);
       } 
       else {
@@ -194,7 +194,7 @@ void __dtor_runtime(void) {
       std::cerr << "Not saving this path\n";
     }
 
-    std::cerr << "Done writing to the file\n";
+    std::cerr << "addcc done.\n Exiting\n";
 }
 
 void _sym_initialize(void) {
@@ -225,7 +225,7 @@ void _sym_initialize(void) {
     std::ifstream infile(g_config.pathModelsFiles);
     std::string line;
     while (std::getline(infile, line)) {
-      std::cerr << "Read line: " << line << "\n";
+      //std::cerr << "Read line: " << line << "\n";
       paths_to_save.push_back(line);
     }
   }
@@ -236,7 +236,7 @@ void _sym_initialize(void) {
     std::ifstream infile(g_config.exploredPathsFile);
     std::string line;
     while (std::getline(infile, line)) {
-      std::cerr << "Read line: " << line << "\n";
+      //std::cerr << "Read line: " << line << "\n";
       discovered_paths.push_back(line);
     }
   }
@@ -400,7 +400,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   if (constraint == nullptr)
     return;
 
-  std::cerr << "Pushing path constraint\n";
+  //std::cerr << "Pushing path constraint\n";
   std::string next_path = current_path;
   if (taken) { 
       current_path += "1";
@@ -411,8 +411,8 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
       next_path += "1";
   }
 
-  std::cerr << "Current path: " << current_path << "\n";
-  std::cerr << "Next path: " << next_path << "\n";
+  //std::cerr << "Current path: " << current_path << "\n";
+  //std::cerr << "Next path: " << next_path << "\n";
 
   // check if the next path exists in any of the paths already explored.
   bool should_save = true;
@@ -442,12 +442,12 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
 
 
   if (should_save) {
-    std::cerr << "SAVING " << next_path << "\n";
+    //std::cerr << "SAVING " << next_path << "\n";
     paths_to_save.push_back(next_path);
     write_to_file(next_path, false);
   } 
   g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
-  std::cerr << "Finished push path constraint\n";
+  //std::cerr << "Finished push path constraint\n";
 }
 
 SymExpr _sym_get_input_byte(size_t offset) {
