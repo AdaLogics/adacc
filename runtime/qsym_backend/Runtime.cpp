@@ -155,8 +155,17 @@ void write_to_file(std::string path_spec, bool write_to_explored_paths) {
   }
 }
 
+static int dtor_done = 0;
+
 void __dtor_runtime(void) {
     std::cerr << "dtoring\n";
+    // A quick hack because we can have multiple calls to dtor
+    // due to our lazy implementation.
+    // This whole dtor should probably be substituted for atexit
+    if (dtor_done == 1) {
+        return;
+    }
+    dtor_done = 1;
 
     // check if the next path exists in any of the paths already explored.
     bool should_save = true;

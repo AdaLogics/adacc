@@ -15,13 +15,10 @@ function usage() {
     echo "initial inputs cover all required input lengths."
 }
 
-while getopts "i:o:a:" opt; do
+while getopts "i:a:" opt; do
     case "$opt" in
         i)
             in=$OPTARG
-            ;;
-        o)
-            out=$OPTARG
             ;;
         a) 
             adir=$OPTARG
@@ -47,10 +44,19 @@ fi
 work_dir=$(mktemp -d)
 mkdir $work_dir/{next,symcc_out}
 touch $work_dir/analyzed_inputs
-rm -rf ${out}
-if [[ -v out ]]; then
-    mkdir -p $out
-fi
+
+rm -rf ${adir}
+mkdir ${adir}
+EXPLORED_PATHS=${adir}/explored_paths.txt
+PATH_MODELS=${adir}/path_models.txt
+SYMCC_LEGIT_FILES=${adir}/legit-files
+
+touch ${EXPLORED_PATHS}
+touch ${PATH_MODELS}
+mkdir ${SYMCC_LEGIT_FILES}
+
+out=${adir}/out
+mkdir ${out}
 
 function cleanup() {
     rm -rf $work_dir
@@ -113,16 +119,6 @@ export SYMCC_OUTPUT_DIR=$work_dir/symcc_out
 export SYMCC_ENABLE_LINEARIZATION=1
 # export SYMCC_AFL_COVERAGE_MAP=$work_dir/map
 
-
-rm -rf ${adir}
-mkdir ${adir}
-EXPLORED_PATHS=${adir}/explored_paths.txt
-PATH_MODELS=${adir}/path_models.txt
-SYMCC_LEGIT_FILES=${adir}/legit-files
-
-touch ${EXPLORED_PATHS}
-touch ${PATH_MODELS}
-mkdir ${SYMCC_LEGIT_FILES}
 
 # Run generation after generation until we don't generate new inputs anymore
 gen_count=0
