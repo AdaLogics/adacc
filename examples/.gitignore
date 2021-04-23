@@ -7,3 +7,4 @@ wdir-*
 symcc-http-parse-fuzz-url
 strcmp-example
 simple-example
+symcc-issue-23-example
