@@ -1,7 +1,9 @@
 inp
 outs
-strcmp-example
-simple-example
 explored_paths.txt
 seed
 wdir-*
+
+symcc-http-parse-fuzz-url
+strcmp-example
+simple-example
