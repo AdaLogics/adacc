@@ -69,6 +69,10 @@ bool SymbolizePass::runOnFunction(Function &F) {
   if (functionName == kSymCtorName)
     return false;
 
+  if (functionName.find("sanitizer_cov_trace") != std::string::npos) {
+     return false;
+  }
+
   DEBUG(errs() << "Symbolizing function ");
   DEBUG(errs().write_escaped(functionName) << '\n');
 

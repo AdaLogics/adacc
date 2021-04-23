@@ -179,6 +179,18 @@ bool _sym_feasible(SymExpr expr);
 void _sym_register_expression_region(SymExpr *start, size_t length);
 void _sym_collect_garbage(void);
 
+/*
+ * Coverage analysis
+ */
+void __s2anitizer_cov_trace_pc_guard_init(uint32_t *start,
+                                        uint32_t *stop);
+/*{
+    printf("Inside sanitizer init\n");
+}*/
+
+void __s2anitizer_cov_trace_pc_guard(uint32_t *guard);
+
+
 #ifdef __cplusplus
 }
 #endif

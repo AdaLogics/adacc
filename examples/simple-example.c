@@ -4,6 +4,22 @@
 #include <string.h>
 #include <stdlib.h>
 
+extern void __s2anitizer_cov_trace_pc_guard(uint32_t *guard);
+extern void __s2anitizer_cov_trace_pc_guard_init(uint32_t *start, uint32_t *stop);
+
+void __sanitizer_cov_trace_pc_guard_init(uint32_t *start,
+                                                            uint32_t *stop) {
+        printf("Hulla hop from init\n");
+        __s2anitizer_cov_trace_pc_guard_init(start, stop);
+        printf("dooooooooone\n");
+}
+
+void __sanitizer_cov_trace_pc_guard(uint32_t *guard) {
+   printf("Calling into s2\n");
+   __s2anitizer_cov_trace_pc_guard(guard);
+   printf("done\n");
+}
+
 int foo(char *arr, int t1) {
     int i = 0;
 
