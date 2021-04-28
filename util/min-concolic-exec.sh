@@ -162,9 +162,9 @@ while true; do
         #sleep 5
     fi
 
-    echo "--- iteration" >> tmps-1.txt
-    cat ./corpus_counters.stats | grep "0" | wc -l >> tmps-1.txt
-    ls -la ${out} | wc -l >> tmps-1.txt
+    echo "--- iteration" >> ${adir}/tmps-1.txt
+    cat ./corpus_counters.stats | grep "0" | wc -l >> ${adir}/tmps-1.txt
+    ls -la ${out} | wc -l >> ${adir}/tmps-1.txt
     #echo "Next dir: ${work_dir}/next"
     #ls -la ${work_dir}/next
     #sleep 4
