@@ -4,8 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "hej.h"
-
 extern void __s2anitizer_cov_trace_pc_guard(uint32_t *guard);
 extern void __s2anitizer_cov_trace_pc_guard_init(uint32_t *start, uint32_t *stop);
 
