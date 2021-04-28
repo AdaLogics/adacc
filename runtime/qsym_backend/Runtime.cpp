@@ -152,7 +152,12 @@ void __dtor_runtime(void) {
  
     // We always get the max value.
     if (curr_counter_val > counters[idx]) {
-		counters[idx] = curr_counter_val;
+        if (curr_counter_val > 255) {
+            counters[idx] = 255;
+        }
+        else {
+            counters[idx] = curr_counter_val;
+        }
     } 
     idx++;
     perm_start++;
@@ -384,8 +389,6 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
       }
   }
 
- 
-
   char *perm_start = get_perm_start();
   char *perm_end = get_perm_end();
    
@@ -402,7 +405,9 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     unsigned int curr_counter_val = (unsigned int)c;
  
     // We always get the max value.
-    if (curr_counter_val > counters[idx]) {
+    if (curr_counter_val <=255 && curr_counter_val > counters[idx]) {
+        std::cerr << "curr_counter_val " << curr_counter_val << "\n";
+        std::cerr << "counters[idx] " << counters[idx] << "\n";
         should_save = true;
 		//counters[idx] = curr_counter_val;
         std::cerr << "There is a difference\n";
@@ -422,6 +427,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   // We save the site_id for all should_saves. should_save will be
   // true the first time the switch is called, but false all other times. We
   // need to fix this.
+  /*
   if (should_save == false) {
     for (auto &sid : site_ids) {
       if (sid == site_id) {
@@ -433,7 +439,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   if (should_save) {
     site_ids.push_back(site_id);
   }
-
+  */
   if (should_save) {
     std::cerr << "Saving\n";
   } 
