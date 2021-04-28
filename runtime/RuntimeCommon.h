@@ -191,6 +191,12 @@ void __s2anitizer_cov_trace_pc_guard_init(uint32_t *start,
 void __s2anitizer_cov_trace_pc_guard(uint32_t *guard);
 
 
+void __s2anitizer_cov_8bit_counters_init(char *start, char *end);
+
+void iterate_8bit_counters();
+char *get_perm_start();
+char *get_perm_end();
+
 #ifdef __cplusplus
 }
 #endif

@@ -170,6 +170,11 @@ void _sym_register_expression_region(SymExpr *start, size_t length) {
 void __s2anitizer_cov_trace_pc_guard_init(uint32_t *start,
                                                     uint32_t *stop) {
     printf("Hulla hop from init\n");
+  static uint64_t N;  // Counter for the guards.
+  if (start == stop || *start) return;  // Initialize only once.
+  printf("INIT: %p %p\n", start, stop);
+  for (uint32_t *x = start; x < stop; x++)
+    *x = ++N;  // Guards should start from 1.
 }
 //  std::cerr << "in __sanitizer_cov_trace_pc_guard_init 123\n";
 //  printf("HAAAAAAAAAAAAAAAAAAllo\n");
@@ -191,6 +196,44 @@ void __s2anitizer_cov_trace_pc_guard_init(uint32_t *start,
 //    __sanitizer_cov_trace_pc_guard(guard);
 void __s2anitizer_cov_trace_pc_guard(uint32_t *guard) {
   std::cerr << "in __sanitizer_cov_trace_pc_guard\n";
+  if (guard != nullptr) {
+    std::cerr << "Guard: " << *guard << "\n";
+  }
+}
+
+char *perm_start = NULL;
+char *perm_end = NULL;
+
+char *get_perm_start(){
+	return perm_start;
+}
+char *get_perm_end(){
+	return perm_end;
+}
+
+
+void __s2anitizer_cov_8bit_counters_init(char *start, char *end) {
+    if (perm_start == NULL) perm_start = start;
+    if (perm_end == NULL) perm_end = end;
+
+    std::cerr << "In void __s2anitizer_cov_8bit_counters_init\n"; 
+    char *tmp = perm_start;
+    while (tmp < perm_end) {
+        char c = *tmp;
+        printf("counter val: %d\n", (int)c);
+        tmp++;
+    }
+}
+
+void iterate_8bit_counters() {
+    std::cerr << "In iterate counters\n"; 
+    char *tmp = perm_start;
+    while (tmp < perm_end) {
+        char c = *tmp;
+        printf("counter val: %d\n", (int)c);
+        tmp++;
+    }
+}
 /*
   if (!*guard) return;  // Duplicate the guard check.
   // If you set *guard to 0 this code will not be called again for this edge.
@@ -206,4 +249,4 @@ void __s2anitizer_cov_trace_pc_guard(uint32_t *guard) {
   __sanitizer_symbolize_pc(PC, "%p %F %L", PcDescr, sizeof(PcDescr));
   printf("guard: %p %x PC %s\n", guard, *guard, PcDescr);
 */
-}
+//}

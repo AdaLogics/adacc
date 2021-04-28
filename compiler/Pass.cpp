@@ -39,10 +39,14 @@ char SymbolizePass::ID = 0;
 bool SymbolizePass::doInitialization(Module &M) {
   DEBUG(errs() << "Symbolizer module init\n");
 
+
+  errs() << "Going through the symboliser \n";
+  errs() << "Analysing filename " << M.getSourceFileName() << "\n";
   // Redirect calls to external functions to the corresponding wrappers and
   // rename internal functions.
   for (auto &function : M.functions()) {
     auto name = function.getName();
+    errs() << "Getting function: " << name << "\n";
     if (isInterceptedFunction(function))
       function.setName(name + "_symbolized");
   }
