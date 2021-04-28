@@ -1,9 +1,14 @@
+corpus_counters.stats
+http-parser
+tiny-regex-c
 inp
 outs
 explored_paths.txt
 seed
 wdir-*
 
+symcc-http-parse-fuzz-parser
+symcc-tiny-regex-re-fuzz
 symcc-http-parse-fuzz-url
 strcmp-example
 simple-example
