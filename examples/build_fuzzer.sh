@@ -4,3 +4,10 @@ SYMCC_REGULAR_LIBCXX=1 symcc -fsanitize-coverage=inline-8bit-counters -c -I./ ./
 SYMCC_REGULAR_LIBCXX=1 symcc -fsanitize-coverage=inline-8bit-counters -c -I./ ./http_parser.c -o http_parser.o 
 cd ../
 SYMCC_REGULAR_LIBCXX=1 symcc libfuzz-harness-proxy.c -fsanitize-coverage=inline-8bit-counters ./http-parser/fuzz_url.o ./http-parser/http_parser.o ../models/klee-libc/minilibc.a -o symcc-http-parse-fuzz-url 
+
+
+cd http-parser
+SYMCC_REGULAR_LIBCXX=1 symcc -fsanitize-coverage=inline-8bit-counters -c -I./ ./fuzzers/fuzz_parser.c -o fuzz_parser.o 
+SYMCC_REGULAR_LIBCXX=1 symcc -fsanitize-coverage=inline-8bit-counters -c -I./ ./http_parser.c -o http_parser.o 
+cd ../
+SYMCC_REGULAR_LIBCXX=1 symcc libfuzz-harness-proxy.c -fsanitize-coverage=inline-8bit-counters ./http-parser/fuzz_parser.o ./http-parser/http_parser.o ../models/klee-libc/minilibc.a -o symcc-http-parse-fuzz-parser
