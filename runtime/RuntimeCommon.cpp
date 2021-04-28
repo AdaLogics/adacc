@@ -216,21 +216,21 @@ void __s2anitizer_cov_8bit_counters_init(char *start, char *end) {
     if (perm_start == NULL) perm_start = start;
     if (perm_end == NULL) perm_end = end;
 
-    std::cerr << "In void __s2anitizer_cov_8bit_counters_init\n"; 
+    //std::cerr << "In void __s2anitizer_cov_8bit_counters_init\n"; 
     char *tmp = perm_start;
     while (tmp < perm_end) {
         char c = *tmp;
-        printf("counter val: %d\n", (int)c);
+        //printf("counter val: %d\n", (int)c);
         tmp++;
     }
 }
 
 void iterate_8bit_counters() {
-    std::cerr << "In iterate counters\n"; 
+    //std::cerr << "In iterate counters\n"; 
     char *tmp = perm_start;
     while (tmp < perm_end) {
         char c = *tmp;
-        printf("counter val: %d\n", (int)c);
+        //printf("counter val: %d\n", (int)c);
         tmp++;
     }
 }

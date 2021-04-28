@@ -177,7 +177,7 @@ void __dtor_runtime(void) {
     while (perm_start  < perm_end) {
         char c = *perm_start;
         int val = (int)c;
-        std::cerr << "PC: " << val << "\n";
+        //std::cerr << "PC: " << val << "\n";
         myfile << val << "\n";
         perm_start++;
     }
@@ -264,13 +264,13 @@ void _sym_initialize(void) {
   ifstream myfile("corpus_counters.stats");
   std::string line2;
   while (std::getline(myfile, line2)) {
-    std::cerr << "Read line: " << line2 << "\n";
+    //std::cerr << "Read line: " << line2 << "\n";
     counters.push_back(atoi(line2.c_str()));
   }
-  std::cerr << "Counters\n";
-  for (auto &val: counters) {
-      std::cerr << val << "\n";
-  }
+  //std::cerr << "Counters\n";
+  //for (auto &val: counters) {
+  //    std::cerr << val << "\n";
+ // }
   std::cerr << "-----------------------\n";
   
 
@@ -429,24 +429,25 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
                                uintptr_t site_id) {
   if (constraint == nullptr)
     return;
-    std::cerr << "Iterating counters from qsym backend\n";
-  iterate_8bit_counters();
-    std::cerr << "Done iterating counters from qsym backend\n";
+    //std::cerr << "Iterating counters from qsym backend\n";
+ // iterate_8bit_counters();
+    //std::cerr << "Done iterating counters from qsym backend\n";
 
 
     char *perm_start = get_perm_start();
     char *perm_end = get_perm_end();
-    while (perm_start  < perm_end) {
+   
+   /* while (perm_start  < perm_end) {
         char c = *perm_start;
         int val = (int)c;
         std::cerr << "PC: " << val << "\n";
         perm_start++;
     }
 
-  // Now let's check if there is a difference in corpus
   perm_start = get_perm_start();
   perm_end = get_perm_end();
-
+*/
+  // Now let's check if there is a difference in corpus
   bool should_save = false;
   if (counters.size() == 0) {
     should_save = true;
@@ -458,8 +459,9 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     if (curr_counter_val > counters[idx]) {
         should_save = true;
         std::cerr << "There is a difference\n";
+        break;
     } else {
-        std::cerr << "There is no difference\n";
+        //std::cerr << "There is no difference\n";
     }
 
     idx++;
@@ -508,11 +510,12 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   //}
 
 
-  //if (should_save) {
+  if (should_save) {
+    std::cerr << "Saving\n";
     //std::cerr << "SAVING " << next_path << "\n";
     //paths_to_save.push_back(next_path);
     //write_to_file(next_path, false);
-  //} 
+  } 
   g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
   //std::cerr << "Finished push path constraint\n";
 }
