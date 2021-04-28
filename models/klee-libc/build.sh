@@ -3,7 +3,7 @@ CS="atexit.c atoi.c bcmp.c calloc.c htonl.c memchr.c mempcpy.c putchar.c stpcpy.
 for f in ${CS}
 do
 	echo ${f}
-	SYMCC_REGULAR_LIBCXX=1 symcc -c ${f} -o ${f}.o
+	SYMCC_REGULAR_LIBCXX=1 symcc -fsanitize-coverage=inline-8bit-counters -c ${f} -o ${f}.o
 done
 
 ar -cr minilibc.a *.o 
