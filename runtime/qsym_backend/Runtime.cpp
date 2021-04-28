@@ -133,9 +133,37 @@ void __dtor_runtime(void) {
     }
     dtor_done = 1;
 
+
+
+  char *perm_start = get_perm_start();
+  char *perm_end = get_perm_end();
+   
+  // Now let's check if there is a difference in corpus
+  bool should_save = false;
+  //if (counters.size() == 0) {
+  //  should_save = true;
+  //}
+
+
+  int idx = 0;
+  while (perm_start < perm_end && idx < counters.size()) {
+    char c = *perm_start;
+    unsigned int curr_counter_val = (unsigned int)c;
+ 
+    // We always get the max value.
+    if (curr_counter_val > counters[idx]) {
+		counters[idx] = curr_counter_val;
+    } 
+    idx++;
+    perm_start++;
+  }
+
+
+
+
     std::cerr << "Inside of dtor, going through all counters\n";
-    char *perm_start = get_perm_start();
-    char *perm_end = get_perm_end();
+    //char *perm_start = get_perm_start();
+   // char *perm_end = get_perm_end();
     
     // Write the updated counters to our corpus file.
   std::cerr << "Preparing to write corpus counter\n";
@@ -363,9 +391,9 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
    
   // Now let's check if there is a difference in corpus
   bool should_save = false;
-  if (counters.size() == 0) {
-    should_save = true;
-  }
+  //if (counters.size() == 0) {
+  //  should_save = true;
+  //}
 
 
   int idx = 0;
@@ -376,7 +404,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     // We always get the max value.
     if (curr_counter_val > counters[idx]) {
         should_save = true;
-		counters[idx] = curr_counter_val;
+		//counters[idx] = curr_counter_val;
         std::cerr << "There is a difference\n";
     } 
 
@@ -389,6 +417,11 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     should_save = true;
   }
 
+  // Ensure this is not a switch instruction.
+  // We need a hack on switch instructions to allow analysis.
+  // We save the site_id for all should_saves. should_save will be
+  // true the first time the switch is called, but false all other times. We
+  // need to fix this.
   if (should_save == false) {
     for (auto &sid : site_ids) {
       if (sid == site_id) {
@@ -397,10 +430,6 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     }
   }
 
-  // We need a hack on switch instructions to allow analysis.
-  // We save the site_id for all should_saves. should_save will be
-  // true the first time the switch is called, but false all other times. We
-  // need to fix this.
   if (should_save) {
     site_ids.push_back(site_id);
   }
