@@ -79,9 +79,6 @@ std::atomic_flag g_initialized = ATOMIC_FLAG_INIT;
 
 /// The file that contains out input.
 std::string inputFileName;
-std::string current_path = "";
-std::vector<std::string> discovered_paths = {""};
-std::vector<std::string> paths_to_save = {""};
 
 void deleteInputFile() { 
     std::cout << " in delete input file\n";
@@ -124,37 +121,6 @@ namespace fs = std::filesystem;
 namespace fs = std::experimental::filesystem;
 #endif
 
-void write_to_file(std::string path_spec, bool write_to_explored_paths) {
-  if (write_to_explored_paths) { 
-      if (!g_config.exploredPathsFile.empty()) {
-        //std::cerr << "The exploredPathsFile is not empty\n";
-        //std::cerr << "Writing path to file: " << path_spec << "\n";
-
-        ofstream myfile;
-        myfile.open (g_config.exploredPathsFile, ios::app);
-        myfile << path_spec << "\n";
-        myfile.close();
-      }
-      else {
-        //std::cerr << "The exploredPathsFile is empty\n";
-      }
-  }
-  else {
-      if (!g_config.pathModelsFiles.empty()) {
-        //std::cerr << "The pathModelsFiles is not empty\n";
-        //std::cerr << "Writing path to file: " << path_spec << "\n";
-
-        ofstream myfile;
-        myfile.open (g_config.pathModelsFiles, ios::app);
-        myfile << path_spec << "\n";
-        myfile.close();
-      }
-      else {
-        //std::cerr << "The pathModelsFiles is empty\n";
-      }
-  }
-}
-
 static int dtor_done = 0;
 
 void __dtor_runtime(void) {
@@ -170,58 +136,17 @@ void __dtor_runtime(void) {
     std::cerr << "Inside of dtor, going through all counters\n";
     char *perm_start = get_perm_start();
     char *perm_end = get_perm_end();
-
-
+    
+    // Write the updated counters to our corpus file.
+  std::cerr << "Preparing to write corpus counter\n";
     ofstream myfile;
     myfile.open ("corpus_counters.stats", ios::trunc);
-    
-  std::cerr << "Preparing to write corpus counter\n";
   for (auto &val: counters) {
       //std::cerr << "writing corpus counter to file " << val << "\n";
         myfile << val << "\n";
   }
-/*
-    while (perm_start  < perm_end) {
-        char c = *perm_start;
-        int val = (int)c;
-        //std::cerr << "PC: " << val << "\n";
-        myfile << val << "\n";
-        perm_start++;
-    }
-*/
     myfile.close();
     std::cerr << "Done going through the counters\n";
-
-    // check if the next path exists in any of the paths already explored.
-    /*
-    bool should_save = true;
-	for (auto &s : discovered_paths) {
-	  if (s.rfind(current_path,0) == 0) {
-	     should_save = false;
-   }
-	}
-
-
-    if (should_save) {
-      write_to_file(current_path, true);
-      if (!g_config.legitFilesDir.empty()) {
-          // We do this because we want to ensure we only create files 
-          // that are relevant for us. Specifically, we want to ensure
-          // we only save files that actually execute a new path and not only models
-          // generated.
-          if (fs::exists(inputFileName)) {
-            std::string dst = g_config.legitFilesDir + "/sample-" + std::to_string(discovered_paths.size());
-            fs::copy(inputFileName, dst);
-          } 
-          else {
-            std::cerr << "Input file does not exist\n";
-          }
-      }
-    } else {
-      std::cerr << "Not saving this path\n";
-    }
-    */
-    std::cerr << "addcc done.\n Exiting\n";
 }
 
 void _sym_initialize(void) {
@@ -247,34 +172,6 @@ void _sym_initialize(void) {
     exit(-1);
   }
 
-  /*
-  if (!g_config.pathModelsFiles.empty()) {
-    std::cerr << "The path models file: :" << g_config.pathModelsFiles << "\n";
-    std::ifstream infile(g_config.pathModelsFiles);
-    std::string line;
-    while (std::getline(infile, line)) {
-      //std::cerr << "Read line: " << line << "\n";
-      paths_to_save.push_back(line);
-    }
-  }
-
-  if (!g_config.exploredPathsFile.empty()) {
-    std::cerr << "The exploredPathsFile is not empty\n";
-    std::cerr << "Reading explored paths from " << g_config.exploredPathsFile << "\n";
-    std::ifstream infile(g_config.exploredPathsFile);
-    std::string line;
-    while (std::getline(infile, line)) {
-      //std::cerr << "Read line: " << line << "\n";
-      discovered_paths.push_back(line);
-    }
-  }
-  else {
-    std::cerr << "The exploredPathsFile is empty\n";
-  }
-  */
-
-  
-
   // Qsym requires the full input in a file
   if (g_config.inputFile.empty()) {
     std::cerr << "Reading program input until EOF (use Ctrl+D in a terminal)..."
@@ -286,13 +183,6 @@ void _sym_initialize(void) {
     std::copy(inputData.begin(), inputData.end(),
               std::ostreambuf_iterator<char>(inputFile));
     inputFile.close();
-
-    //for (auto b: inputData) {
-    //    my_input_copy.push_back(b);
-    //}
-      //std::cerr << "Size2 of input copy: " << my_input_copy.size() << "\n";
-      //std::cerr << "Size3 of inputData: " << inputData.size() << "\n";
-//    std::copy(inputData.begin(), inputData.end(), my_input_copy);
 
 #ifdef DEBUG_RUNTIME
     std::cerr << "Loaded input:" << std::endl;
@@ -431,13 +321,12 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   if (constraint == nullptr)
     return;
 
+  // Handle the case where the counters have not yet
+  // been initialised. 
   if (counters.size() == 0) {
-      //std::cerr << "I1\n";  
       ifstream myfile("corpus_counters.stats");
       std::string line2;
       while (std::getline(myfile, line2)) {
-      //std::cerr << "I2\n";  
-        //std::cerr << "Read line: " << line2 << "\n";
         counters.push_back(atoi(line2.c_str()));
       }
 
@@ -445,55 +334,24 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
       // initialize it.
       //std::cerr << "I3\n";  
       if (counters.size() == 0) {
-      //std::cerr << "I4\n";  
       // Now let's check if there is a difference in corpus
         char *perm_start = get_perm_start();
         char *perm_end = get_perm_end();
-        //printf("%p\n", perm_start);
-        //printf("%p\n", perm_end);
 
         ofstream myfile;
         myfile.open ("corpus_counters.stats", ios::trunc);
         while (perm_start  < perm_end) {
-          //std::cerr << "I4.1\n";  
             char c = *perm_start;
             int val = (int)c;
-            //std::cerr << "intialising corpus counters\n";
             counters.push_back(val);
-            //std::cerr << "PC: " << val << "\n";
-    //		myfile << val << "\n";
             perm_start++;
         }
-      //std::cerr << "I5\n";  
-
       }
-      //std::cerr << "I6\n";  
-
-      //std::cerr << "Counters\n";
-      //for (auto &val: counters) {
-      //    std::cerr << val << "\n";
-     // }
-      //std::cerr << "-----------------------\n";
-
   }
-    //std::cerr << "Iterating counters from qsym backend\n";
- // iterate_8bit_counters();
-    //std::cerr << "Done iterating counters from qsym backend\n";
 
-
-    char *perm_start = get_perm_start();
-    char *perm_end = get_perm_end();
+  char *perm_start = get_perm_start();
+  char *perm_end = get_perm_end();
    
-   /* while (perm_start  < perm_end) {
-        char c = *perm_start;
-        int val = (int)c;
-        std::cerr << "PC: " << val << "\n";
-        perm_start++;
-    }
-
-  perm_start = get_perm_start();
-  perm_end = get_perm_end();
-*/
   // Now let's check if there is a difference in corpus
   bool should_save = false;
   if (counters.size() == 0) {
@@ -509,62 +367,14 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
         should_save = true;
 		counters[idx] = curr_counter_val;
         std::cerr << "There is a difference\n";
-//        break;
-    } else {
-        //std::cerr << "There is no difference\n";
-    }
+    } 
 
     idx++;
     perm_start++;
   }
 
-  //std::cerr << "Pushing path constraint\n";
-  /*
-  std::string next_path = current_path;
-  if (taken) { 
-      current_path += "1";
-      next_path += "0";
-  }
-  else { 
-      current_path += "0"; 
-      next_path += "1";
-  }
-*/
-  //std::cerr << "Current path: " << current_path << "\n";
-  //std::cerr << "Next path: " << next_path << "\n";
-/*
-  // check if the next path exists in any of the paths already explored.
-  bool should_save = true;
-  //for (std::vector<std::string>::iterator t=discovered_paths.begin(); t!=discovered_paths.end(); ++t) {
-  for (auto &s : discovered_paths) {
-    if (s.rfind(next_path,0 ) == 0) {
-       should_save = false;
-    }
-  }
-  for (auto &s : paths_to_save) {
-    if (s.rfind(next_path,0 ) == 0) {
-      should_save = false;
-    }
-  }
-  */
-  //if (std::find(discovered_paths.begin(), 
-  //              discovered_paths.end(),
-  //              next_path) != discovered_paths.end()) {
-  //    std::cerr << "Should not save this path\n";
-      // We already have this path, so let's not rediscover it.
-  //    should_save = false;
-  //} else {
-    //write_to_file(current_path);
-
-  //    std::cerr << "Current path " << current_path << "\n";  
-  //}
-
-
   if (should_save) {
     std::cerr << "Saving\n";
-    //std::cerr << "SAVING " << next_path << "\n";
-    //paths_to_save.push_back(next_path);
-    //write_to_file(next_path, false);
   } 
   g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
   //std::cerr << "Finished push path constraint\n";
