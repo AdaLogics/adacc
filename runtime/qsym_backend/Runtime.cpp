@@ -88,7 +88,7 @@ void deleteInputFile() {
     std::remove(inputFileName.c_str()); 
 }
 
-std::vector<char> my_input_copy;
+//std::vector<char> my_input_copy;
 std::vector<int> counters;
 
 /// A mapping of all expressions that we have ever received from Qsym to the
@@ -174,6 +174,13 @@ void __dtor_runtime(void) {
 
     ofstream myfile;
     myfile.open ("corpus_counters.stats", ios::trunc);
+    
+  std::cerr << "Preparing to write corpus counter\n";
+  for (auto &val: counters) {
+      //std::cerr << "writing corpus counter to file " << val << "\n";
+        myfile << val << "\n";
+  }
+/*
     while (perm_start  < perm_end) {
         char c = *perm_start;
         int val = (int)c;
@@ -181,16 +188,19 @@ void __dtor_runtime(void) {
         myfile << val << "\n";
         perm_start++;
     }
+*/
     myfile.close();
     std::cerr << "Done going through the counters\n";
 
     // check if the next path exists in any of the paths already explored.
+    /*
     bool should_save = true;
 	for (auto &s : discovered_paths) {
 	  if (s.rfind(current_path,0) == 0) {
 	     should_save = false;
-	  }
+   }
 	}
+
 
     if (should_save) {
       write_to_file(current_path, true);
@@ -210,6 +220,7 @@ void __dtor_runtime(void) {
     } else {
       std::cerr << "Not saving this path\n";
     }
+    */
     std::cerr << "addcc done.\n Exiting\n";
 }
 
@@ -236,6 +247,7 @@ void _sym_initialize(void) {
     exit(-1);
   }
 
+  /*
   if (!g_config.pathModelsFiles.empty()) {
     std::cerr << "The path models file: :" << g_config.pathModelsFiles << "\n";
     std::ifstream infile(g_config.pathModelsFiles);
@@ -259,19 +271,8 @@ void _sym_initialize(void) {
   else {
     std::cerr << "The exploredPathsFile is empty\n";
   }
+  */
 
-  
-  ifstream myfile("corpus_counters.stats");
-  std::string line2;
-  while (std::getline(myfile, line2)) {
-    //std::cerr << "Read line: " << line2 << "\n";
-    counters.push_back(atoi(line2.c_str()));
-  }
-  //std::cerr << "Counters\n";
-  //for (auto &val: counters) {
-  //    std::cerr << val << "\n";
- // }
-  std::cerr << "-----------------------\n";
   
 
   // Qsym requires the full input in a file
@@ -286,11 +287,11 @@ void _sym_initialize(void) {
               std::ostreambuf_iterator<char>(inputFile));
     inputFile.close();
 
-    for (auto b: inputData) {
-        my_input_copy.push_back(b);
-    }
-      std::cerr << "Size2 of input copy: " << my_input_copy.size() << "\n";
-      std::cerr << "Size3 of inputData: " << inputData.size() << "\n";
+    //for (auto b: inputData) {
+    //    my_input_copy.push_back(b);
+    //}
+      //std::cerr << "Size2 of input copy: " << my_input_copy.size() << "\n";
+      //std::cerr << "Size3 of inputData: " << inputData.size() << "\n";
 //    std::copy(inputData.begin(), inputData.end(), my_input_copy);
 
 #ifdef DEBUG_RUNTIME
@@ -429,6 +430,52 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
                                uintptr_t site_id) {
   if (constraint == nullptr)
     return;
+
+  if (counters.size() == 0) {
+      //std::cerr << "I1\n";  
+      ifstream myfile("corpus_counters.stats");
+      std::string line2;
+      while (std::getline(myfile, line2)) {
+      //std::cerr << "I2\n";  
+        //std::cerr << "Read line: " << line2 << "\n";
+        counters.push_back(atoi(line2.c_str()));
+      }
+
+      // We need to check if counters is of size zero here, so we can
+      // initialize it.
+      //std::cerr << "I3\n";  
+      if (counters.size() == 0) {
+      //std::cerr << "I4\n";  
+      // Now let's check if there is a difference in corpus
+        char *perm_start = get_perm_start();
+        char *perm_end = get_perm_end();
+        //printf("%p\n", perm_start);
+        //printf("%p\n", perm_end);
+
+        ofstream myfile;
+        myfile.open ("corpus_counters.stats", ios::trunc);
+        while (perm_start  < perm_end) {
+          //std::cerr << "I4.1\n";  
+            char c = *perm_start;
+            int val = (int)c;
+            //std::cerr << "intialising corpus counters\n";
+            counters.push_back(val);
+            //std::cerr << "PC: " << val << "\n";
+    //		myfile << val << "\n";
+            perm_start++;
+        }
+      //std::cerr << "I5\n";  
+
+      }
+      //std::cerr << "I6\n";  
+
+      //std::cerr << "Counters\n";
+      //for (auto &val: counters) {
+      //    std::cerr << val << "\n";
+     // }
+      //std::cerr << "-----------------------\n";
+
+  }
     //std::cerr << "Iterating counters from qsym backend\n";
  // iterate_8bit_counters();
     //std::cerr << "Done iterating counters from qsym backend\n";
@@ -456,10 +503,13 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   while (perm_start < perm_end && idx < counters.size()) {
     char c = *perm_start;
     int curr_counter_val = (int)c;
+ 
+    // We always get the max value.
     if (curr_counter_val > counters[idx]) {
         should_save = true;
+		counters[idx] = curr_counter_val;
         std::cerr << "There is a difference\n";
-        break;
+//        break;
     } else {
         //std::cerr << "There is no difference\n";
     }

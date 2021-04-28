@@ -213,6 +213,7 @@ char *get_perm_end(){
 
 
 void __s2anitizer_cov_8bit_counters_init(char *start, char *end) {
+    printf("We are iterating through\n");
     if (perm_start == NULL) perm_start = start;
     if (perm_end == NULL) perm_end = end;
 
