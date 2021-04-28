@@ -86,7 +86,7 @@ void deleteInputFile() {
 }
 
 //std::vector<char> my_input_copy;
-std::vector<int> counters;
+std::vector<unsigned int> counters;
 
 /// A mapping of all expressions that we have ever received from Qsym to the
 /// corresponding shared pointers on the heap.
@@ -316,11 +316,17 @@ SymExpr _sym_build_trunc(SymExpr expr, uint8_t bits) {
       g_expr_builder->createTrunc(allocatedExpressions.at(expr), bits));
 }
 
+std::vector<uintptr_t> site_ids;
+
 void _sym_push_path_constraint(SymExpr constraint, int taken,
                                uintptr_t site_id) {
   if (constraint == nullptr)
     return;
+  //std::cerr << "Pushing path constraint\n";
 
+  //uint32_t val2 = *(uint32_t *)site_id;
+  //std::cerr << "site-id: " << val2 << "\n";
+  //std::cerr << "taken: " << taken << "\n";
   // Handle the case where the counters have not yet
   // been initialised. 
   if (counters.size() == 0) {
@@ -342,12 +348,15 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
         myfile.open ("corpus_counters.stats", ios::trunc);
         while (perm_start  < perm_end) {
             char c = *perm_start;
-            int val = (int)c;
-            counters.push_back(val);
+            unsigned int val = (unsigned int)c;
+            // We want to initialise it all to 0s, so we trigger analysis at first.
+            counters.push_back(0);
             perm_start++;
         }
       }
   }
+
+ 
 
   char *perm_start = get_perm_start();
   char *perm_end = get_perm_end();
@@ -357,10 +366,12 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   if (counters.size() == 0) {
     should_save = true;
   }
+
+
   int idx = 0;
   while (perm_start < perm_end && idx < counters.size()) {
     char c = *perm_start;
-    int curr_counter_val = (int)c;
+    unsigned int curr_counter_val = (unsigned int)c;
  
     // We always get the max value.
     if (curr_counter_val > counters[idx]) {
@@ -371,6 +382,27 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
 
     idx++;
     perm_start++;
+  }
+
+  static bool force_check = false;
+  if (force_check) {
+    should_save = true;
+  }
+
+  if (should_save == false) {
+    for (auto &sid : site_ids) {
+      if (sid == site_id) {
+        should_save = true;
+      }
+    }
+  }
+
+  // We need a hack on switch instructions to allow analysis.
+  // We save the site_id for all should_saves. should_save will be
+  // true the first time the switch is called, but false all other times. We
+  // need to fix this.
+  if (should_save) {
+    site_ids.push_back(site_id);
   }
 
   if (should_save) {
