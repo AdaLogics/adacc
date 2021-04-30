@@ -8,4 +8,13 @@ val=$(find ./ -name "wdir-*" | wc -l)
 val2=$(($val+1))
 rm -rf wdir-${val2} 
 mkdir wdir-${val2}
+
+if [ -d "./inp" ]
+then
+    echo "input exists - using ./inp"
+else 
+    echo "input directory does not exist, creating ./inp"
+    mkdir inp 
+    echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" >> inp/seed1
+fi
 ../util/min-concolic-exec.sh -i ./inp -a ./wdir-${val2} ${target} @@
