@@ -195,9 +195,11 @@ void __s2anitizer_cov_trace_pc_guard_init(uint32_t *start,
 // But for large functions it will emit a simple call:
 //    __sanitizer_cov_trace_pc_guard(guard);
 void __s2anitizer_cov_trace_pc_guard(uint32_t *guard) {
-  std::cerr << "in __sanitizer_cov_trace_pc_guard\n";
+  //std::cerr << "in __sanitizer_cov_trace_pc_guard\n";
+  printf("in __sanitizer_cov_trace_pc_guard\n");
   if (guard != nullptr) {
-    std::cerr << "Guard: " << *guard << "\n";
+    printf("Guard: %p\n", guard);
+    //std::cerr << "Guard: " << *guard << "\n";
   }
 }
 
@@ -218,22 +220,26 @@ void __s2anitizer_cov_8bit_counters_init(char *start, char *end) {
     if (perm_end == NULL) perm_end = end;
 
     //std::cerr << "In void __s2anitizer_cov_8bit_counters_init\n"; 
+    /*
     char *tmp = perm_start;
     while (tmp < perm_end) {
         char c = *tmp;
         //printf("counter val: %d\n", (int)c);
         tmp++;
     }
+    */
 }
 
 void iterate_8bit_counters() {
     //std::cerr << "In iterate counters\n"; 
+    /*
     char *tmp = perm_start;
     while (tmp < perm_end) {
         char c = *tmp;
         //printf("counter val: %d\n", (int)c);
         tmp++;
     }
+    */
 }
 /*
   if (!*guard) return;  // Duplicate the guard check.
