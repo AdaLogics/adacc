@@ -75,30 +75,14 @@ install_symcc() {
     ninja check 
     cargo install --path ../symcc/util/symcc_fuzzing_helper
 
-	# Build libc++ with SymCC using the simple backend
-    #rm -rf libcxx_symcc
-    #rm -rf libcxx_symcc_install
-	#cd ${BASE} && mkdir libcxx_symcc && cd libcxx_symcc
-	#export SYMCC_REGULAR_LIBCXX=yes SYMCC_NO_SYMBOLIC_INPUT=yes 
-	#mkdir ./libcxx_symcc_build 
-    #cd ./libcxx_symcc_build 
-	#cmake -G Ninja ${BASE}/llvm_source/llvm \
-#			 -DLLVM_ENABLE_PROJECTS="libcxx;libcxxabi" \
-#			 -DLLVM_TARGETS_TO_BUILD="X86" \
-#			 -DLLVM_DISTRIBUTION_COMPONENTS="cxx;cxxabi;cxx-headers" \
-#			 -DCMAKE_BUILD_TYPE=Release \
-#			 -DCMAKE_INSTALL_PREFIX=${BASE}/libcxx_symcc_install \
-#			 -DCMAKE_C_COMPILER=${BASE}/symcc_build/symcc \
-#			 -DCMAKE_CXX_COMPILER=${BASE}/symcc_build/sym++ 
-#    ninja distribution 
-#    ninja install-distribution
     echo " installing libcxx"
+    cd ${BASE}
 	rm -rf ./libcxx_native-symbolic
 	mkdir ./libcxx_native-symbolic
 	cd ./libcxx_native-symbolic
 
 	export SYMCC_REGULAR_LIBCXX=yes SYMCC_NO_SYMBOLIC_INPUT=yes
-	cmake ../llvm-project/llvm  \
+	cmake ../llvm_source/llvm  \
 			 -G Ninja \
 			 -DLLVM_ENABLE_PROJECTS="libcxx;libcxxabi" \
 			 -DLLVM_DISTRIBUTION_COMPONENTS="cxx;cxxabi;cxx-headers" \
