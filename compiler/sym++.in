@@ -16,6 +16,7 @@
 
 runtime_64bit_dir="${SYMCC_RUNTIME_DIR:-@SYM_RUNTIME_DIR@}"
 runtime_32bit_dir="${SYMCC_RUNTIME32_DIR:-@SYM_RUNTIME_32BIT_DIR@}"
+builtin_libcc="${SYMCC_LIBCXX_PATH:-@SYM_RUNTIME_DIR@/../../../../libcxx_native-symbolic/}"
 pass="${SYMCC_PASS_DIR:-@CMAKE_CURRENT_BINARY_DIR@}/libSymbolize.so"
 libcxx_var=SYMCC_LIBCXX_PATH
 compiler="${SYMCC_CLANGPP:-@CLANGPP_BINARY@}"
@@ -39,14 +40,15 @@ if [[ -v SYMCC_REGULAR_LIBCXX ]]; then
     stdlib_cflags=
     stdlib_ldflags=
 elif [[ ! -v $libcxx_var ]]; then
-    >&2 echo "Please set $libcxx_var to the directory containing libc++ or confirm usage of the system library by setting SYMCC_REGULAR_LIBCXX!"
-    exit 255
+    #>&2 echo "Please set $libcxx_var to the directory containing libc++ or confirm usage of the system library by setting SYMCC_REGULAR_LIBCXX!"
+
+    stdlib_cflags="-isystem ${builtin_libcc}/include/c++/v1 -nostdlib++ -nostdinc++ "
+    stdlib_ldflags="-L${builtin_libcc}/lib -Wl,-rpath, ${builtin_libcc}/lib -lstdc++ -lc++ -stdlib=libc++ "
+    #exit 255
 else
     # It is important that the resulting binaries load libstdc++ before libc++;
     # otherwise our backend calls the instrumented library in cases where
     # exported names collide.
-    #stdlib_cflags="-isystem ${!libcxx_var}/include/c++/v1 -nostdlib++"
-    #stdlib_ldflags="-L${!libcxx_var}/lib -Wl,-rpath,${!libcxx_var}/lib -lstdc++ -lc++ -stdlib=libc++"
     stdlib_cflags="-isystem ${!libcxx_var}/include/c++/v1 -nostdlib++ -nostdinc++ "
     stdlib_ldflags="-L${!libcxx_var}/lib -Wl,-rpath, ${!libcxx_var}/lib -lstdc++ -lc++ -stdlib=libc++ "
 fi
