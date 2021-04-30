@@ -417,7 +417,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     perm_start++;
   }
 
-  static bool force_check = false;
+  static bool force_check = true;
   if (force_check) {
     should_save = true;
   }
