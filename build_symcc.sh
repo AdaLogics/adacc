@@ -1,6 +1,7 @@
 BASE=$PWD
 
 install_packages() {
+    echo "[+] installing packages"
 	sudo apt-get update 
 	sudo apt-get install -y \
 			cargo \
@@ -15,10 +16,11 @@ install_packages() {
 			zlib1g-dev 
 	   
 	pip3 install lit
+    echo "[+] done installing packages"
 }
 
 get_deps() {
-	echo "Installing deps"
+	echo "[+] installing deps"
 	#git clone https://github.com/eurecom-s3/symcc
 	cd symcc/runtime/qsym_backend
     git clone https://github.com/AdaLogics/qsym
@@ -47,12 +49,12 @@ get_deps() {
 	# SymCC changes
 	cd ${BASE}
 	git clone -b llvmorg-10.0.1 --depth 1 https://github.com/llvm/llvm-project.git ./llvm_source
-	echo "Finished installing deps"
+	echo "[+] finished installing deps"
 }
 
 
 install_symcc() {
-	echo "Installing SymCC"
+	echo "[+] installing SymCC"
 	# Build a version of SymCC with the simple backend to compile libc++
 	mkdir symcc_build
 	cd symcc_build
@@ -90,18 +92,18 @@ install_symcc() {
 			 -DCMAKE_CXX_COMPILER=${BASE}/symcc_build/sym++ 
     ninja distribution 
     ninja install-distribution
-	echo "Done installing SymCC"
+	echo "[+] done installing SymCC"
 }
 
 cleanup() {
-    echo "[+] Cleaning up"
+    echo "[+] cleaning up"
     sudo rm -rf ./afl
     sudo rm -rf ./libcxx_symcc
     sudo rm -rf ./libcxx_symcc_install
     sudo rm -rf ./llvm_source
     sudo rm -rf ./symcc_build
     sudo rm -rf ./symcc_build_qsym
-    echo "[+] Done cleaning up"
+    echo "[+] done cleaning up"
 }
 
 cleanup
