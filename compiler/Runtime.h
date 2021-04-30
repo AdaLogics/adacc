@@ -28,6 +28,10 @@
 struct Runtime {
   Runtime(llvm::Module &M);
 
+  int random_number;
+
+  SymFnT cov_fun_callback{};
+
   SymFnT buildInteger{};
   SymFnT buildInteger128{};
   SymFnT buildFloat{};

@@ -163,7 +163,10 @@ while true; do
     fi
 
     echo "--- iteration" >> ${adir}/tmps-1.txt
-    cat ./corpus_counters.stats | grep "0" | wc -l >> ${adir}/tmps-1.txt
+    #cat ./corpus_counters.stats | grep "0" | wc -l >> ${adir}/tmps-1.txt
+    echo ">>> Generation ${gen_count}" >> ${adir}/tmps-1.txt
+    cat ./corpus_counters.stats >> ${adir}/tmps-1.txt
+    cp corpus_counters.stats ${adir}/generation-${gen_count}.stats
     ls -la ${out} | wc -l >> ${adir}/tmps-1.txt
     #echo "Next dir: ${work_dir}/next"
     #ls -la ${work_dir}/next

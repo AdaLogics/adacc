@@ -37,15 +37,23 @@ for arg in "$@"; do
 done
 
 if [[ -v SYMCC_REGULAR_LIBCXX ]]; then
+    echo "Using regular"
+    #stdlib_cflags= " -nostdlib++ -nostdinc++ -fsanitize-coverage=inline-8bit-counters "
+
     stdlib_cflags=
     stdlib_ldflags=
+    
+    #stdlib_cflags= " -nostdlib++ -nostdinc++ "
+    #stdlib_ldflags=" -lstdc++ -lc++ -stdlib=libc++ "
 elif [[ ! -v $libcxx_var ]]; then
+    echo "Using irregular"
     #>&2 echo "Please set $libcxx_var to the directory containing libc++ or confirm usage of the system library by setting SYMCC_REGULAR_LIBCXX!"
 
     stdlib_cflags="-isystem ${builtin_libcc}/include/c++/v1 -nostdlib++ -nostdinc++ "
     stdlib_ldflags="-L${builtin_libcc}/lib -Wl,-rpath, ${builtin_libcc}/lib -lstdc++ -lc++ -stdlib=libc++ "
     #exit 255
 else
+    echo "Using specified"
     # It is important that the resulting binaries load libstdc++ before libc++;
     # otherwise our backend calls the instrumented library in cases where
     # exported names collide.
@@ -57,8 +65,12 @@ if [ $# -eq 0 ]; then
     echo "Use sym++ as a drop-in replacement for clang++, e.g., sym++ -O2 -o foo foo.cpp" >&2
     exit 1
 fi
+     #-fsanitize-coverage="inline-8bit-counters" \
 
-exec $compiler                                  \
+echo "stdlib_cflags: ${stdlib_cflags}" 
+echo "stdlib_ldflags: ${stdlib_ldflags}" 
+
+exec $compiler -v                                 \
      -Xclang -load -Xclang "$pass"              \
      $stdlib_cflags                             \
      "$@"                                       \

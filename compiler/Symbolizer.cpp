@@ -896,6 +896,12 @@ Symbolizer::forceBuildRuntimeCall(IRBuilder<> &IRB, SymFnT function,
   for (const auto &[arg, symbolic] : args) {
     functionArgs.push_back(symbolic ? getSymbolicExpressionOrNull(arg) : arg);
   }
+  errs() << "Inside of force build runtime call " << my_random_number << "\n";
+
+  std::vector<Value *> functionArgs2;
+  functionArgs2.push_back(IRB.getInt32(my_random_number++));
+  IRB.CreateCall(runtime.cov_fun_callback, functionArgs2);
+
   auto *call = IRB.CreateCall(function, functionArgs);
 
   std::vector<Input> inputs;

@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
   std::string name;
   std::cin >> name;
 
-  if (name == "root")
+  if (name == "BBCDEFBHBGBZBEBBBBBBBBBBBBBBBBBBBBBBB")
     std::cout << "What is your command?" << std::endl;
   else
     std::cout << "Hello, " << name << "!" << std::endl;

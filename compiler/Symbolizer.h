@@ -129,6 +129,7 @@ public:
   void visitSwitchInst(llvm::SwitchInst &I);
   void visitUnreachableInst(llvm::UnreachableInst &);
   void visitInstruction(llvm::Instruction &I);
+  int my_random_number;
 
 private:
   static constexpr unsigned kExpectedMaxPHINodesPerFunction = 16;
@@ -148,6 +149,7 @@ private:
       user->setOperand(operandIndex, newOperand);
     }
   };
+
 
   /// A symbolic computation with its inputs.
   struct SymbolicComputation {

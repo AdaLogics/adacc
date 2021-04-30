@@ -493,6 +493,8 @@ size_t _sym_bits_helper(SymExpr expr) {
   return result;
 }
 
+void _symcc_cov_cb(uint32_t cb_id) {if (cb_id== 123123123) {printf("unused\n");}}
+
 /* No call-stack tracing */
 void _sym_notify_call(uintptr_t) {}
 void _sym_notify_ret(uintptr_t) {}

@@ -82,6 +82,10 @@ install_symcc() {
 	cd ./libcxx_native-symbolic
 
 	export SYMCC_REGULAR_LIBCXX=yes SYMCC_NO_SYMBOLIC_INPUT=yes
+    
+	#CFLAGS="-fsanitize-coverage=inline-8bit-counters" CXXFLAGS="-fsanitize-coverage=inline-8bit-counters" cmake ../llvm_source/llvm  \
+    #export CFLAGS="${CFLAGS} -fsanitize-coverage=inline-8bit-counters"
+    #export CXXFLAGS="${CXXFLAGS} -fsanitize-coverage=inline-8bit-counters"
 	cmake ../llvm_source/llvm  \
 			 -G Ninja \
 			 -DLLVM_ENABLE_PROJECTS="libcxx;libcxxabi" \
@@ -90,7 +94,9 @@ install_symcc() {
 			 -DCMAKE_BUILD_TYPE=Release \
 			 -DCMAKE_INSTALL_PREFIX=${BASE}/libcxx_native_build \
 			 -DCMAKE_C_COMPILER=${BASE}/symcc_build/symcc \
-			 -DCMAKE_CXX_COMPILER=${BASE}/symcc_build/sym++
+			 -DCMAKE_CXX_COMPILER=${BASE}/symcc_build/sym++ \
+             -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON 
+
 	ninja distribution
 	ninja install-distribution
 
@@ -99,10 +105,10 @@ install_symcc() {
 
 cleanup() {
     echo "[+] cleaning up"
-    sudo rm -rf ./afl
-    sudo rm -rf ./libcxx_symcc
+    #sudo rm -rf ./afl
+    #sudo rm -rf ./libcxx_symcc
+    #sudo rm -rf ./llvm_source
     sudo rm -rf ./libcxx_symcc_install
-    sudo rm -rf ./llvm_source
     sudo rm -rf ./symcc_build
     sudo rm -rf ./symcc_build_qsym
     echo "[+] done cleaning up"
@@ -110,5 +116,5 @@ cleanup() {
 
 cleanup
 #install_packages
-get_deps
+#get_deps
 install_symcc

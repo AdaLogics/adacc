@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-
+/*
 #ifndef NOCOV
 extern void __s2anitizer_cov_trace_pc_guard(uint32_t *guard);
 extern void __s2anitizer_cov_trace_pc_guard_init(uint32_t *start, uint32_t *stop);
@@ -27,17 +27,16 @@ void __sanitizer_cov_8bit_counters_init(char *start, char *end) {
   // [start,end) is the array of 8-bit counters created for the current DSO.
   // printf("Yup yey\n");
   // Capture this array in order to read/modify the counters.
-  /*
   char *tmp_p = start;
   while (tmp_p < end) {
     char c = *tmp_p;
     printf("Counter value: %d\n", (int)c);
     tmp_p++;
-  }*/
+  }
   __s2anitizer_cov_8bit_counters_init(start, end);
 }
 #endif
-
+*/
 
 int foo(char *arr, int t1) {
     int i = 0;

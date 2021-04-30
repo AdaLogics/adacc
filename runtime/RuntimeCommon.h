@@ -167,6 +167,8 @@ void _sym_notify_call(uintptr_t site_id);
 void _sym_notify_ret(uintptr_t site_id);
 void _sym_notify_basic_block(uintptr_t site_id);
 
+void _symcc_cov_cb(uint32_t bb_id);
+
 /*
  * Debugging
  */

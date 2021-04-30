@@ -64,7 +64,7 @@
 #include <Shadow.h>
 
 namespace qsym {
-
+   
 ExprBuilder *g_expr_builder;
 Solver *g_solver;
 CallStackManager g_call_stack_manager;
@@ -87,6 +87,11 @@ void deleteInputFile() {
 
 //std::vector<char> my_input_copy;
 std::vector<unsigned int> counters;
+std::vector<unsigned int> new_counters;
+
+
+std::map<uint32_t, uint32_t> old_counter_map;
+std::map<uint32_t, uint32_t> counter_map;
 
 /// A mapping of all expressions that we have ever received from Qsym to the
 /// corresponding shared pointers on the heap.
@@ -124,7 +129,7 @@ namespace fs = std::experimental::filesystem;
 static int dtor_done = 0;
 
 void __dtor_runtime(void) {
-    std::cerr << "dtoring\n";
+    //std::cerr << "dtoring\n";
     // A quick hack because we can have multiple calls to dtor
     // due to our lazy implementation.
     // This whole dtor should probably be substituted for atexit
@@ -132,6 +137,7 @@ void __dtor_runtime(void) {
         return;
     }
     dtor_done = 1;
+
 
 
 
@@ -172,12 +178,41 @@ void __dtor_runtime(void) {
     
     // Write the updated counters to our corpus file.
   std::cerr << "Preparing to write corpus counter\n";
+
+	  for (auto& new_c: counter_map) {
+		uint32_t k,v;
+		k = new_c.first;
+		v = new_c.second;
+		if (old_counter_map.count(k) == 0) {
+          old_counter_map[k] = v;
+		  //should_save = true;
+		  break;
+		}
+		if (old_counter_map.at(k) < v) {
+          old_counter_map[k] = v;
+//		  should_save = true;
+		  break;
+		}
+	  }
+
+
+    std::cerr << "Counters we save:\n";
+  for (auto& it: old_counter_map) {
+    std::cerr << "(" << it.first << ", " << it.second << ")\n";
+  }
+    std::cerr << "-----------\n";
+
     ofstream myfile;
     myfile.open ("corpus_counters.stats", ios::trunc);
-  for (auto &val: counters) {
-      //std::cerr << "writing corpus counter to file " << val << "\n";
-        myfile << val << "\n";
+  for (auto& it: old_counter_map) {
+      myfile << it.first << "\n";
+      myfile << it.second << "\n";
+//    std::cerr << "(" << it.first << ", " << it.second << ")\n";
   }
+  //for (auto &val: counters) {
+      //std::cerr << "writing corpus counter to file " << val << "\n";
+  //      myfile << val << "\n";
+  //}
     myfile.close();
     std::cerr << "Done going through the counters\n";
 }
@@ -351,6 +386,8 @@ SymExpr _sym_build_trunc(SymExpr expr, uint8_t bits) {
 
 std::vector<uintptr_t> site_ids;
 
+bool map_initialsed = false;
+
 void _sym_push_path_constraint(SymExpr constraint, int taken,
                                uintptr_t site_id) {
   if (constraint == nullptr)
@@ -362,16 +399,48 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   //std::cerr << "taken: " << taken << "\n";
   // Handle the case where the counters have not yet
   // been initialised. 
-  if (counters.size() == 0) {
+//  if (counters.size() == 0) {
+  if (!map_initialsed) {
       ifstream myfile("corpus_counters.stats");
       std::string line2;
+
+      int first = 0;
+      uint32_t cb_id = 0;
+      uint32_t cb_count = 0;
       while (std::getline(myfile, line2)) {
-        counters.push_back(atoi(line2.c_str()));
+        //counters.push_back(atoi(line2.c_str()));
+          //std::cerr << "get line " << "line2 \n"; 
+            
+            if (first == 0) {
+                cb_id = (uint32_t)atol(line2.c_str());
+                first++;
+            } else {
+                cb_count = (uint32_t)atol(line2.c_str());
+                first =0;
+                old_counter_map[cb_id] = cb_count;
+                cb_id = 0;
+                cb_count =0;
+            }
+
+          //sscanf(line2.c_str(), "%u %u", first, second);
+          //std::cerr << "firts: " << first << "\n";
+          //std::cerr << "second " << second << "\n";
+         // int second;
+          //line2 >> line;
       }
+      // Now write the counters.
+      std::cerr << "The counters we read:\n";
+      for (auto& it: old_counter_map) {
+		std::cerr << "(" << it.first << ", " << it.second << ")\n";
+	  }
+		std::cerr << "-----------\n";
+        map_initialsed = true;
+    
 
       // We need to check if counters is of size zero here, so we can
       // initialize it.
       //std::cerr << "I3\n";  
+/*
       if (counters.size() == 0) {
       // Now let's check if there is a difference in corpus
         char *perm_start = get_perm_start();
@@ -387,6 +456,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
             perm_start++;
         }
       }
+*/
   }
 
   char *perm_start = get_perm_start();
@@ -399,6 +469,27 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   //}
 
 
+  // Now go through the counter map and see if we have bettered anything.
+  for (auto& new_c: counter_map) {
+    uint32_t k,v;
+    k = new_c.first;
+    v = new_c.second;
+    if (old_counter_map.count(k) == 0) {
+      should_save = true;
+      break;
+    }
+    if (old_counter_map.at(k) < v) {
+      should_save = true;
+      break;
+    }
+  }
+  if (should_save) {
+    std::cerr << "Should save\n";
+  } else {
+    std::cerr << "Should not save\n";
+  }
+
+/*
   int idx = 0;
   while (perm_start < perm_end && idx < counters.size()) {
     char c = *perm_start;
@@ -416,8 +507,8 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     idx++;
     perm_start++;
   }
-
-  static bool force_check = true;
+*/
+  static bool force_check = false;
   if (force_check) {
     should_save = true;
   }
@@ -505,6 +596,17 @@ UNSUPPORTED(SymExpr _sym_build_float_to_unsigned_integer(SymExpr, uint8_t))
 
 #undef UNSUPPORTED
 #undef H
+
+void _symcc_cov_cb(uint32_t cb_id) {
+//    printf("In callback with cb_id %u\n", cb_id);
+
+    if (counter_map.count(cb_id) == 0) {
+        // Counter is not in the map. So let's insert it.
+        counter_map[cb_id] = 1;
+    } else {
+        counter_map[cb_id]++;
+    }
+}
 
 //
 // Call-stack tracing
