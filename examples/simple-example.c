@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifndef NOCOV
 extern void __s2anitizer_cov_trace_pc_guard(uint32_t *guard);
 extern void __s2anitizer_cov_trace_pc_guard_init(uint32_t *start, uint32_t *stop);
 
@@ -35,6 +36,7 @@ void __sanitizer_cov_8bit_counters_init(char *start, char *end) {
   }*/
   __s2anitizer_cov_8bit_counters_init(start, end);
 }
+#endif
 
 
 int foo(char *arr, int t1) {
@@ -64,6 +66,22 @@ int foo(char *arr, int t1) {
     return 99;
 }
 
+void target(const char *string, size_t size) {
+    // pass string to foo
+    int retval = foo(string, (int)size);
+    if (retval == 99) {
+        printf("Goaaaaaal!\n");
+    } else {
+        printf("Fail\n");
+    }
+    int val1 = 0;
+    for (int i=0; i < 5; i++) {
+        val1 += (int)string[i];
+    }
+    if (val1 == 123123) printf("Heyo\n");
+}
+
+#ifndef NOCOV
 int main(int argc, char* argv[]) {
     // open file
     FILE *f = fopen(argv[1], "rb");
@@ -78,19 +96,14 @@ int main(int argc, char* argv[]) {
     fread(string, 1, fsize, f);
     fclose(f);
 
-    // pass string to foo
-    int retval = foo(string, argc-2);
-    if (retval == 99) {
-        printf("Goaaaaaal!\n");
-    } else {
-        printf("Fail\n");
-    }
-    int val1 = 0;
-    for (int i=0; i < 5; i++) {
-        val1 += (int)string[i];
-    }
-    if (val1 == 123123) printf("Heyo\n");
+    target(string, fsize);
 
     free(string);
     return retval;
 }
+#else
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    target(data, size);
+    return 0;
+}
+#endif
