@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
     target(string, fsize);
 
     free(string);
-    return retval;
+    return 1;
 }
 #else
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
