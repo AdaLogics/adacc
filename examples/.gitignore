@@ -6,7 +6,10 @@ outs
 explored_paths.txt
 seed
 wdir-*
+cov*
+merged*
 
+fuzz_binary
 symcc-http-parse-fuzz-parser
 symcc-tiny-regex-re-fuzz
 symcc-http-parse-fuzz-url
