@@ -66,6 +66,7 @@ trap cleanup EXIT
 
 # Copy all files in the source directory to the destination directory, renaming
 # them according to their hash.
+global_file_counter=0
 function copy_with_unique_name() {
     local source_dir="$1"
     local dest_dir="$2"
@@ -74,6 +75,8 @@ function copy_with_unique_name() {
         local f
         for f in $source_dir/*; do
             local dest="$dest_dir/$(sha256sum $f | cut -d' ' -f1)"
+            #dest="$dest_dir/filenum-${global_file_counter}"
+            #global_file_counter=$((global_file_counter+1))
             cp "$f" "$dest"
         done
     fi
@@ -84,6 +87,7 @@ function add_to_next_generation() {
     echo "Copying ${1}"
     local source_dir="$1"
     copy_with_unique_name "$source_dir" "$work_dir/next"
+    echo "Done copying\n"
 }
 
 # If an output directory is set, copy the files in the source directory there.
@@ -151,6 +155,7 @@ while true; do
             maybe_export $work_dir/symcc_out
             echo $(basename $f) >> $work_dir/analyzed_inputs
             rm -f $f
+            #rm -rf ${SYMCC_OUTPUT_DIR} && mkdir ${SYMCC_OUTPUT_DIR}
         done
 
         rm -rf $work_dir/cur
