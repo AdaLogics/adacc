@@ -412,20 +412,22 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     }
   }
 
+  // Am unsure if the stuff below should be necessary, since
+  // we make the switch instructions verbose.
   // Ensure this is not a switch instruction.
   // We need a hack on switch instructions to allow analysis.
   // We save the site_id for all should_saves. should_save will be
   // true the first time the switch is called, but false all other times. We
   // need to fix this.
   //if (should_save == false) {
-    for (auto &sid : site_ids) {
-      if (sid == site_id) {
-        should_save = true;
-      }
-    }
+  //  for (auto &sid : site_ids) {
+  //    if (sid == site_id) {
+  //      should_save = true;
+  //    }
+  //  }
   //}
   //if (should_save) {
-    site_ids.push_back(site_id);
+  //  site_ids.push_back(site_id);
   //}
 
   // Logging
