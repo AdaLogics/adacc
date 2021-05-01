@@ -138,44 +138,9 @@ void __dtor_runtime(void) {
     }
     dtor_done = 1;
 
-
-
-
-  //char *perm_start = get_perm_start();
-  //char *perm_end = get_perm_end();
-   
   // Now let's check if there is a difference in corpus
   bool should_save = false;
-  //if (counters.size() == 0) {
-  //  should_save = true;
-  //}
-
-
-  //int idx = 0;
-  /*
-  while (perm_start < perm_end && idx < counters.size()) {
-    char c = *perm_start;
-    unsigned int curr_counter_val = (unsigned int)c;
- 
-    // We always get the max value.
-    if (curr_counter_val > counters[idx]) {
-        if (curr_counter_val > 255) {
-            counters[idx] = 255;
-        }
-        else {
-            counters[idx] = curr_counter_val;
-        }
-    } 
-    idx++;
-    perm_start++;
-  }*/
-
-
-
-
     std::cerr << "Inside of dtor, going through all counters\n";
-    //char *perm_start = get_perm_start();
-   // char *perm_end = get_perm_end();
     
     // Write the updated counters to our corpus file.
   std::cerr << "Preparing to write corpus counter\n";
@@ -186,22 +151,20 @@ void __dtor_runtime(void) {
 		v = new_c.second;
 		if (old_counter_map.count(k) == 0) {
           old_counter_map[k] = v;
-		  //should_save = true;
 		  break;
 		}
 		if (old_counter_map.at(k) < v) {
           old_counter_map[k] = v;
-//		  should_save = true;
 		  break;
 		}
 	  }
 
 
-    std::cerr << "Counters we save:\n";
-  for (auto& it: old_counter_map) {
-    std::cerr << "(" << it.first << ", " << it.second << ")\n";
-  }
-    std::cerr << "-----------\n";
+  //  std::cerr << "Counters we save:\n";
+  //for (auto& it: old_counter_map) {
+  //  std::cerr << "(" << it.first << ", " << it.second << ")\n";
+  //}
+  //  std::cerr << "-----------\n";
 
     ofstream myfile;
     myfile.open ("corpus_counters.stats", ios::trunc);
@@ -210,10 +173,7 @@ void __dtor_runtime(void) {
       myfile << it.second << "\n";
 //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
   }
-  //for (auto &val: counters) {
-      //std::cerr << "writing corpus counter to file " << val << "\n";
-  //      myfile << val << "\n";
-  //}
+
     myfile.close();
     std::cerr << "Done going through the counters\n";
 }
@@ -393,14 +353,9 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
                                uintptr_t site_id) {
   if (constraint == nullptr)
     return;
-  //std::cerr << "Pushing path constraint\n";
 
-  //uint32_t val2 = *(uint32_t *)site_id;
-  //std::cerr << "site-id: " << val2 << "\n";
-  //std::cerr << "taken: " << taken << "\n";
   // Handle the case where the counters have not yet
   // been initialised. 
-//  if (counters.size() == 0) {
   if (!map_initialsed) {
       ifstream myfile("corpus_counters.stats");
       std::string line2;
@@ -409,68 +364,31 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
       uint32_t cb_id = 0;
       uint32_t cb_count = 0;
       while (std::getline(myfile, line2)) {
-        //counters.push_back(atoi(line2.c_str()));
-          //std::cerr << "get line " << "line2 \n"; 
-            
-            if (first == 0) {
-                cb_id = (uint32_t)atol(line2.c_str());
-                first++;
-            } else {
-                cb_count = (uint32_t)atol(line2.c_str());
-                first =0;
-                old_counter_map[cb_id] = cb_count;
-                cb_id = 0;
-                cb_count =0;
-            }
-
-          //sscanf(line2.c_str(), "%u %u", first, second);
-          //std::cerr << "firts: " << first << "\n";
-          //std::cerr << "second " << second << "\n";
-         // int second;
-          //line2 >> line;
+        if (first == 0) {
+            cb_id = (uint32_t)atol(line2.c_str());
+            first++;
+        } else {
+            cb_count = (uint32_t)atol(line2.c_str());
+            first =0;
+            old_counter_map[cb_id] = cb_count;
+            cb_id = 0;
+            cb_count =0;
+        }
       }
-      // Now write the counters.
+
+      // Now write the counters for logging.
       std::cerr << "The counters we read:\n";
       for (auto& it: old_counter_map) {
 		std::cerr << "(" << it.first << ", " << it.second << ")\n";
 	  }
 		std::cerr << "-----------\n";
         map_initialsed = true;
-    
-
-      // We need to check if counters is of size zero here, so we can
-      // initialize it.
-      //std::cerr << "I3\n";  
-/*
-      if (counters.size() == 0) {
-      // Now let's check if there is a difference in corpus
-        char *perm_start = get_perm_start();
-        char *perm_end = get_perm_end();
-
-        ofstream myfile;
-        myfile.open ("corpus_counters.stats", ios::trunc);
-        while (perm_start  < perm_end) {
-            char c = *perm_start;
-            unsigned int val = (unsigned int)c;
-            // We want to initialise it all to 0s, so we trigger analysis at first.
-            counters.push_back(0);
-            perm_start++;
-        }
-      }
-*/
   }
-
-  //char *perm_start = get_perm_start();
-  //char *perm_end = get_perm_end();
    
   // Now let's check if there is a difference in corpus
   bool should_save = false;
-  //if (counters.size() == 0) {
-  //  should_save = true;
-  //}
 
-
-  // Now go through the counter map and see if we have bettered anything.
+  // Go through the counter map and see if we have bettered anything.
   for (auto& new_c: counter_map) {
     uint32_t k,v;
     k = new_c.first;
@@ -485,54 +403,20 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
       break;
     } 
   }
+
+  // Logging
   if (should_save) {
     std::cerr << "Should save\n";
   } else {
     std::cerr << "Should not save\n";
   }
 
-/*
-  int idx = 0;
-  while (perm_start < perm_end && idx < counters.size()) {
-    char c = *perm_start;
-    unsigned int curr_counter_val = (unsigned int)c;
- 
-    // We always get the max value.
-    if (curr_counter_val <=255 && curr_counter_val > counters[idx]) {
-        std::cerr << "curr_counter_val " << curr_counter_val << "\n";
-        std::cerr << "counters[idx] " << counters[idx] << "\n";
-        should_save = true;
-		//counters[idx] = curr_counter_val;
-        std::cerr << "There is a difference\n";
-    } 
-
-    idx++;
-    perm_start++;
-  }
-*/
+  // Hack to allow permanent solving. For debugging
   static bool force_check = false;
   if (force_check) {
     should_save = true;
   }
 
-  // Ensure this is not a switch instruction.
-  // We need a hack on switch instructions to allow analysis.
-  // We save the site_id for all should_saves. should_save will be
-  // true the first time the switch is called, but false all other times. We
-  // need to fix this.
-  /*
-  if (should_save == false) {
-    for (auto &sid : site_ids) {
-      if (sid == site_id) {
-        should_save = true;
-      }
-    }
-  }
-
-  if (should_save) {
-    site_ids.push_back(site_id);
-  }
-  */
   if (should_save) {
     std::cerr << "Saving\n";
   } 
