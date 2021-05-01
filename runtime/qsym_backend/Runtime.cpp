@@ -141,8 +141,8 @@ void __dtor_runtime(void) {
 
 
 
-  char *perm_start = get_perm_start();
-  char *perm_end = get_perm_end();
+  //char *perm_start = get_perm_start();
+  //char *perm_end = get_perm_end();
    
   // Now let's check if there is a difference in corpus
   bool should_save = false;
@@ -151,7 +151,8 @@ void __dtor_runtime(void) {
   //}
 
 
-  int idx = 0;
+  //int idx = 0;
+  /*
   while (perm_start < perm_end && idx < counters.size()) {
     char c = *perm_start;
     unsigned int curr_counter_val = (unsigned int)c;
@@ -167,7 +168,7 @@ void __dtor_runtime(void) {
     } 
     idx++;
     perm_start++;
-  }
+  }*/
 
 
 
@@ -459,8 +460,8 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
 */
   }
 
-  char *perm_start = get_perm_start();
-  char *perm_end = get_perm_end();
+  //char *perm_start = get_perm_start();
+  //char *perm_end = get_perm_end();
    
   // Now let's check if there is a difference in corpus
   bool should_save = false;
