@@ -476,13 +476,14 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     k = new_c.first;
     v = new_c.second;
     if (old_counter_map.count(k) == 0) {
+      std::cerr << "Found counter not in old map " << k << "\n";
       should_save = true;
       break;
-    }
+    } 
     if (old_counter_map.at(k) < v) {
       should_save = true;
       break;
-    }
+    } 
   }
   if (should_save) {
     std::cerr << "Should save\n";
@@ -535,7 +536,9 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   if (should_save) {
     std::cerr << "Saving\n";
   } 
-  g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
+  //if (should_save) {
+      g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
+  //}
   //std::cerr << "Finished push path constraint\n";
 }
 
