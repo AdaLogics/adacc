@@ -93,6 +93,7 @@ std::vector<unsigned int> new_counters;
 std::map<uint32_t, uint32_t> old_counter_map;
 std::map<uint32_t, uint32_t> counter_map;
 
+
 /// A mapping of all expressions that we have ever received from Qsym to the
 /// corresponding shared pointers on the heap.
 ///
@@ -143,19 +144,24 @@ void __dtor_runtime(void) {
     std::cerr << "Inside of dtor, going through all counters\n";
     
     // Write the updated counters to our corpus file.
+    //
+ 
   std::cerr << "Preparing to write corpus counter\n";
 
+  bool has_had_change = false;
 	  for (auto& new_c: counter_map) {
 		uint32_t k,v;
 		k = new_c.first;
 		v = new_c.second;
 		if (old_counter_map.count(k) == 0) {
           old_counter_map[k] = v;
-		  break;
+          has_had_change = true;
+		  //break;
 		}
 		if (old_counter_map.at(k) < v) {
           old_counter_map[k] = v;
-		  break;
+          has_had_change = true;
+		  //break;
 		}
 	  }
 
@@ -166,15 +172,17 @@ void __dtor_runtime(void) {
   //}
   //  std::cerr << "-----------\n";
 
-    ofstream myfile;
-    myfile.open ("corpus_counters.stats", ios::trunc);
-  for (auto& it: old_counter_map) {
-      myfile << it.first << "\n";
-      myfile << it.second << "\n";
-//    std::cerr << "(" << it.first << ", " << it.second << ")\n";
-  }
+  //if (has_had_change) {
+        ofstream myfile;
+        myfile.open ("corpus_counters.stats", ios::trunc);
+      for (auto& it: old_counter_map) {
+          myfile << it.first << "\n";
+          myfile << it.second << "\n";
+    //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
+      }
 
-    myfile.close();
+        myfile.close();
+ // }
     std::cerr << "Done going through the counters\n";
 }
 
@@ -377,11 +385,11 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
       }
 
       // Now write the counters for logging.
-      std::cerr << "The counters we read:\n";
-      for (auto& it: old_counter_map) {
-		std::cerr << "(" << it.first << ", " << it.second << ")\n";
-	  }
-		std::cerr << "-----------\n";
+      //std::cerr << "The counters we read:\n";
+      //for (auto& it: old_counter_map) {
+	  //	std::cerr << "(" << it.first << ", " << it.second << ")\n";
+	  //}
+	  // std::cerr << "-----------\n";
         map_initialsed = true;
   }
    
@@ -401,8 +409,24 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     if (old_counter_map.at(k) < v) {
       should_save = true;
       break;
-    } 
+    }
   }
+
+  // Ensure this is not a switch instruction.
+  // We need a hack on switch instructions to allow analysis.
+  // We save the site_id for all should_saves. should_save will be
+  // true the first time the switch is called, but false all other times. We
+  // need to fix this.
+  //if (should_save == false) {
+    for (auto &sid : site_ids) {
+      if (sid == site_id) {
+        should_save = true;
+      }
+    }
+  //}
+  //if (should_save) {
+    site_ids.push_back(site_id);
+  //}
 
   // Logging
   if (should_save) {
@@ -486,8 +510,6 @@ UNSUPPORTED(SymExpr _sym_build_float_to_unsigned_integer(SymExpr, uint8_t))
 #undef H
 
 void _symcc_cov_cb(uint32_t cb_id) {
-//    printf("In callback with cb_id %u\n", cb_id);
-
     if (counter_map.count(cb_id) == 0) {
         // Counter is not in the map. So let's insert it.
         counter_map[cb_id] = 1;

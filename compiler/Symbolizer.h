@@ -36,6 +36,7 @@ public:
   /// Insert a call to the run-time library to notify it of the basic block
   /// entry.
   void insertBasicBlockNotification(llvm::BasicBlock &B);
+  void insertCovs(llvm::BasicBlock &B);
 
   /// Finish the processing of PHI nodes.
   ///

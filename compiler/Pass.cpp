@@ -18,6 +18,7 @@
 #include <llvm/IR/InstIterator.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
+#include "llvm/Transforms/Utils.h"
 #include <llvm/Transforms/Utils/ModuleUtils.h>
 
 #include "Runtime.h"
@@ -89,6 +90,9 @@ bool SymbolizePass::runOnFunction(Function &F) {
   }
 
 
+  //FunctionPass *lower = createLowerSwitchPass();
+  //lower->runOnFunction(F); 
+
   DEBUG(errs() << "Symbolizing function ");
   DEBUG(errs().write_escaped(functionName) << '\n');
 
@@ -119,6 +123,8 @@ bool SymbolizePass::runOnFunction(Function &F) {
 
   symbolizer.finalizePHINodes();
   symbolizer.shortCircuitExpressionUses();
+  for (auto &basicBlock : F)
+    symbolizer.insertCovs(basicBlock);
 
   // DEBUG(errs() << F << '\n');
   assert(!verifyFunction(F, &errs()) &&

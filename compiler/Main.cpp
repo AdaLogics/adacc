@@ -13,12 +13,18 @@
 // SymCC. If not, see <https://www.gnu.org/licenses/>.
 
 #include <llvm/IR/LegacyPassManager.h>
+#include "llvm/Transforms/Utils.h"
 #include <llvm/Transforms/IPO/PassManagerBuilder.h>
 
 #include "Pass.h"
 
 void addSymbolizePass(const llvm::PassManagerBuilder & /* unused */,
                       llvm::legacy::PassManagerBase &PM) {
+  PM.add(llvm::createLowerSwitchPass());
+        
+//          FunctionPass *lower = createLowerSwitchPass();
+  //          lower->runOnFunction(F);
+
   PM.add(new SymbolizePass());
 }
 
