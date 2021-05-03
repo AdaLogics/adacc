@@ -382,10 +382,11 @@ void Symbolizer::visitSelectInst(SelectInst &I) {
   // expression over from the chosen argument.
 
   IRBuilder<> IRB(&I);
+  /*
   std::vector<Value *> functionArgs2;
   functionArgs2.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs2);
-
+*/
   errs() << "Inserting the instruction\n";
   auto runtimeCall = buildRuntimeCall(IRB, runtime.pushPathConstraint,
                                       {{I.getCondition(), true},
@@ -430,10 +431,11 @@ void Symbolizer::visitBranchInst(BranchInst &I) {
     return;
 
   IRBuilder<> IRB(&I);
+  /*
   std::vector<Value *> functionArgs2;
   functionArgs2.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs2);
-
+  */
   auto runtimeCall = buildRuntimeCall(IRB, runtime.pushPathConstraint,
                                       {{I.getCondition(), true},
                                        {I.getCondition(), false},
@@ -805,31 +807,39 @@ void Symbolizer::visitSwitchInst(SwitchInst &I) {
   if (conditionExpr == nullptr)
     return;
 
+  /*
   std::vector<Value *> functionArgs3;
   functionArgs3.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs3);
-
+  */
   // Build a check whether we have a symbolic condition, to be used later.
   auto *haveSymbolicCondition = IRB.CreateICmpNE(
       conditionExpr, ConstantPointerNull::get(IRB.getInt8PtrTy()));
+  /*
   std::vector<Value *> functionArgs5;
   functionArgs5.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs5);
+  */
+
   auto *constraintBlock = SplitBlockAndInsertIfThen(haveSymbolicCondition, &I,
                                                     /* unreachable */ false);
 
+  /*
   std::vector<Value *> functionArgs4;
   functionArgs4.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs4);
+  */
 
   // In the constraint block, we push one path constraint per case.
   IRB.SetInsertPoint(constraintBlock);
   for (auto &caseHandle : I.cases()) {
     auto *caseTaken = IRB.CreateICmpEQ(condition, caseHandle.getCaseValue());
 
+  /*
   std::vector<Value *> functionArgs2;
   functionArgs2.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs2);
+  */
 
     auto *caseConstraint = IRB.CreateCall(
         runtime.comparisonHandlers[CmpInst::ICMP_EQ],
@@ -933,10 +943,11 @@ Symbolizer::forceBuildRuntimeCall(IRBuilder<> &IRB, SymFnT function,
   }
   errs() << "Inside of force build runtime call " << my_random_number << "\n";
 
+  /*
   std::vector<Value *> functionArgs2;
   functionArgs2.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs2);
-
+  */
   auto *call = IRB.CreateCall(function, functionArgs);
 
   std::vector<Input> inputs;
@@ -953,10 +964,11 @@ void Symbolizer::tryAlternative(IRBuilder<> &IRB, Value *V) {
   auto *destExpr = getSymbolicExpression(V);
   if (destExpr != nullptr) {
 
+  /*
   std::vector<Value *> functionArgs2;
   functionArgs2.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs2);
-
+  */
 
     auto *concreteDestExpr = createValueExpression(V, IRB);
     auto *destAssertion =
