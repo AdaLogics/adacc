@@ -117,5 +117,5 @@ cleanup() {
 
 cleanup
 #install_packages
-#get_deps
+get_deps
 install_symcc
