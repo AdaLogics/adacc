@@ -4,6 +4,7 @@ install_packages() {
     echo "[+] installing packages"
 	sudo apt-get update 
 	sudo apt-get install -y \
+		        python2 \
 			cargo \
 			clang-10 \
 			cmake \
