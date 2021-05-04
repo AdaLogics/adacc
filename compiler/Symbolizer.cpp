@@ -559,8 +559,8 @@ void Symbolizer::visitGetElementPtrInst(GetElementPtrInst &I) {
           dataLayout.getStructLayout(structType)->getElementOffset(memberIndex);
       addressContribution = {ConstantInt::get(intPtrType, memberOffset), true};
     } else {
-      if (auto *ci = dyn_cast<ConstantInt>(index);
-          ci != nullptr && ci->isZero()) {
+      auto *ci = dyn_cast<ConstantInt>(index);
+      if (ci != nullptr && ci->isZero()) {
         // Fast path: an index of zero means that no calculations are
         // performed.
         continue;
@@ -572,8 +572,8 @@ void Symbolizer::visitGetElementPtrInst(GetElementPtrInst &I) {
 
       unsigned elementSize =
           dataLayout.getTypeAllocSize(type_it.getIndexedType());
-      if (auto indexWidth = index->getType()->getIntegerBitWidth();
-          indexWidth != ptrBits) {
+      auto indexWidth = index->getType()->getIntegerBitWidth();
+      if (indexWidth != ptrBits) {
         symbolicComputation.merge(forceBuildRuntimeCall(
             IRB, runtime.buildZExt,
             {{index, true},

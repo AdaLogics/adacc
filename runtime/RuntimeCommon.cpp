@@ -55,7 +55,7 @@ void _sym_memcpy(uint8_t *dest, const uint8_t *src, size_t length) {
     return;
 
   ReadOnlyShadow srcShadow(src, length);
-  ReadWriteShadow destShadow(dest, length);
+  ReadWriteShadow<uint8_t> destShadow(dest, length);
   std::copy(srcShadow.begin(), srcShadow.end(), destShadow.begin());
 }
 
@@ -63,7 +63,7 @@ void _sym_memset(uint8_t *memory, SymExpr value, size_t length) {
   if ((value == nullptr) && isConcrete(memory, length))
     return;
 
-  ReadWriteShadow shadow(memory, length);
+  ReadWriteShadow<uint8_t> shadow(memory, length);
   std::fill(shadow.begin(), shadow.end(), value);
 }
 
@@ -72,7 +72,7 @@ void _sym_memmove(uint8_t *dest, const uint8_t *src, size_t length) {
     return;
 
   ReadOnlyShadow srcShadow(src, length);
-  ReadWriteShadow destShadow(dest, length);
+  ReadWriteShadow<uint8_t> destShadow(dest, length);
   if (dest > src)
     std::copy_backward(srcShadow.begin(), srcShadow.end(), destShadow.end());
   else
@@ -119,7 +119,7 @@ void _sym_write_memory(uint8_t *addr, size_t length, SymExpr expr,
   if (expr == nullptr && isConcrete(addr, length))
     return;
 
-  ReadWriteShadow shadow(addr, length);
+  ReadWriteShadow<uint8_t> shadow(addr, length);
   if (expr == nullptr) {
     std::fill(shadow.begin(), shadow.end(), nullptr);
   } else {

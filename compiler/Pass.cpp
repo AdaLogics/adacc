@@ -66,7 +66,8 @@ bool SymbolizePass::doInitialization(Module &M) {
   // Insert a constructor that initializes the runtime and any globals.
   Function *ctor;
   std::tie(ctor, std::ignore) = createSanitizerCtorAndInitFunctions(
-      M, kSymCtorName, "_sym_initialize", {}, {});
+      M, "__sym_ctor", "_sym_initialize", {}, {});
+      //M, kSymCtorName, "_sym_initialize", {}, {});
   appendToGlobalCtors(M, ctor, 0);
 
   // Add a dtor function for cleaning up paths.
@@ -82,7 +83,8 @@ bool SymbolizePass::doInitialization(Module &M) {
 
 bool SymbolizePass::runOnFunction(Function &F) {
   auto functionName = F.getName();
-  if (functionName == kSymCtorName)
+  //if (functionName == kSymCtorName)
+  if (functionName == "__sym_ctor")
     return false;
 
   if (functionName.find("sanitizer_cov_trace") != std::string::npos) {

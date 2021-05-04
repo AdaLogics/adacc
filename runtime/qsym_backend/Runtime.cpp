@@ -19,6 +19,7 @@
 #include "Runtime.h"
 #include "GarbageCollection.h"
 
+/*
 // C++
 #if __has_include(<filesystem>)
 #define HAVE_FILESYSTEM 1
@@ -27,6 +28,7 @@
 #else
 #error "We need either <filesystem> or the older <experimental/filesystem>."
 #endif
+*/
 
 #include <atomic>
 #include <fstream>
@@ -35,11 +37,13 @@
 #include <map>
 #include <unordered_set>
 
+/*
 #if HAVE_FILESYSTEM
 #include <filesystem>
 #else
 #include <experimental/filesystem>
 #endif
+*/
 
 #ifdef DEBUG_RUNTIME
 #include <chrono>
@@ -121,11 +125,13 @@ SymExpr registerExpression(const qsym::ExprRef &expr) {
 
 using namespace qsym;
 
+/*
 #if HAVE_FILESYSTEM
 namespace fs = std::filesystem;
 #else
 namespace fs = std::experimental::filesystem;
 #endif
+*/
 
 static int dtor_done = 0;
 
@@ -201,6 +207,7 @@ void _sym_initialize(void) {
   }
 
   // Check the output directory
+/*
   if (!fs::exists(g_config.outputDir) ||
       !fs::is_directory(g_config.outputDir)) {
     std::cerr << "Error: the output directory " << g_config.outputDir
@@ -208,7 +215,7 @@ void _sym_initialize(void) {
               << std::endl;
     exit(-1);
   }
-
+*/
   // Qsym requires the full input in a file
   if (g_config.inputFile.empty()) {
     std::cerr << "Reading program input until EOF (use Ctrl+D in a terminal)..."

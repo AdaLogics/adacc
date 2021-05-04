@@ -15,7 +15,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(SymRuntime)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 \
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wc++17-extensions \
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  \
 -Wredundant-decls -Wcast-align \
 -Wmissing-include-dirs -Wswitch-default \
 -Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \

@@ -136,11 +136,11 @@ ssize_t SYM(read)(int fildes, void *buf, size_t nbyte) {
 
   if (fildes == inputFileDescriptor) {
     // Reading symbolic input.
-    ReadWriteShadow shadow(buf, result);
+    ReadWriteShadow<void> shadow(buf, result);
     std::generate(shadow.begin(), shadow.end(),
                   []() { return _sym_get_input_byte(inputOffset++); });
   } else if (!isConcrete(buf, result)) {
-    ReadWriteShadow shadow(buf, result);
+    ReadWriteShadow<void> shadow(buf, result);
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
 
@@ -235,11 +235,11 @@ size_t SYM(fread)(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 
   if (fileno(stream) == inputFileDescriptor) {
     // Reading symbolic input.
-    ReadWriteShadow shadow(ptr, result * size);
+    ReadWriteShadow<void> shadow(ptr, result * size);
     std::generate(shadow.begin(), shadow.end(),
                   []() { return _sym_get_input_byte(inputOffset++); });
   } else if (!isConcrete(ptr, result * size)) {
-    ReadWriteShadow shadow(ptr, result * size);
+    ReadWriteShadow<void> shadow(ptr, result * size);
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
 
@@ -255,11 +255,11 @@ char *SYM(fgets)(char *str, int n, FILE *stream) {
 
   if (fileno(stream) == inputFileDescriptor) {
     // Reading symbolic input.
-    ReadWriteShadow shadow(str, sizeof(char) * strlen(str));
+    ReadWriteShadow<char> shadow(str, sizeof(char) * strlen(str));
     std::generate(shadow.begin(), shadow.end(),
                   []() { return _sym_get_input_byte(inputOffset++); });
   } else if (!isConcrete(str, sizeof(char) * strlen(str))) {
-    ReadWriteShadow shadow(str, sizeof(char) * strlen(str));
+    ReadWriteShadow<char> shadow(str, sizeof(char) * strlen(str));
     std::fill(shadow.begin(), shadow.end(), nullptr);
   }
 
@@ -422,11 +422,11 @@ char *SYM(strncpy)(char *dest, const char *src, size_t n) {
     return result;
 
   auto srcShadow = ReadOnlyShadow(src, copied);
-  auto destShadow = ReadWriteShadow(dest, n);
+  auto destShadow = ReadWriteShadow<char>(dest, n);
 
   std::copy(srcShadow.begin(), srcShadow.end(), destShadow.begin());
   if (copied < n) {
-    ReadWriteShadow destRestShadow(dest + copied, n - copied);
+    ReadWriteShadow<char> destRestShadow(dest + copied, n - copied);
     std::fill(destRestShadow.begin(), destRestShadow.end(), nullptr);
   }
 

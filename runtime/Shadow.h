@@ -12,8 +12,8 @@
 // You should have received a copy of the GNU General Public License along with
 // SymCC. If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef SHADOW_H
-#define SHADOW_H
+//#ifndef SHADOW_H
+//#define SHADOW_H
 
 #include <algorithm>
 #include <cassert>
@@ -215,4 +215,4 @@ template <typename T> bool isConcrete(T *addr, size_t nbytes) {
                      [](SymExpr expr) { return (expr == nullptr); });
 }
 
-#endif
+//#endif

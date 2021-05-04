@@ -65,9 +65,9 @@ int foo(char *arr, int t1) {
     return 99;
 }
 
-void target(const char *string, size_t size) {
+void target(char *string, size_t size) {
     // pass string to foo
-    int retval = foo(string, (int)size);
+    int retval = foo((char*)string, (int)size);
     if (retval == 99) {
         printf("Goaaaaaal!\n");
     } else {

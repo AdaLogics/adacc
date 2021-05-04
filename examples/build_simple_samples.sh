@@ -9,4 +9,4 @@
 SYMCC_REGULAR_LIBCXX=1 symcc ./simple-example.c -o simple-example
 
 
-sym++ ./hello-world.cpp -o hello-world
+#sym++ ./hello-world.cpp -o hello-world
