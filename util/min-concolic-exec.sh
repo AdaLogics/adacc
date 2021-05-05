@@ -55,8 +55,9 @@ touch ${EXPLORED_PATHS}
 touch ${PATH_MODELS}
 mkdir ${SYMCC_LEGIT_FILES}
 
-out=${adir}/out
-mkdir ${out}
+#out=${adir}/out
+out=${THE_OUT_DIR}
+mkdir ${out} || true
 
 function cleanup() {
     rm -rf $work_dir

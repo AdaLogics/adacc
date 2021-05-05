@@ -8,6 +8,7 @@ val=$(find ./ -name "wdir-*" | wc -l)
 val2=$(($val+1))
 rm -rf wdir-${val2} 
 mkdir wdir-${val2}
+export THE_OUT_DIR="wdir-${val2}/out"
 
 if [ -d "./inp" ]
 then
