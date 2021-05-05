@@ -39,6 +39,10 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/expr_builder__gen.cpp
   ${QSYM_SOURCE_DIR}/codegen/expr_builder.cpp
   ${QSYM_SOURCE_DIR}/codegen/gen_expr_builder.py)
 
+# The following part of the CMake file was copied from the 
+# KLEE project. The license for this code is under the same license
+# as the license in models/klee-libc/LICENSE.txt
+
 function(_run_llvm_config output_var)
   set(_command "${LLVM_CONFIG_BINARY}" ${ARGN})
   execute_process(COMMAND ${_command}

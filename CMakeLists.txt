@@ -67,6 +67,9 @@ if (${TARGET_32BIT})
   set(SYM_RUNTIME_32BIT_DIR ${BINARY_DIR})
 endif()
 
+# The following part of the CMake file was copied from the 
+# KLEE project. The license for this code is under the same license
+# as the license in models/klee-libc/LICENSE.txt
 function(_run_llvm_config output_var)
   set(_command "${LLVM_CONFIG_BINARY}" ${ARGN})
   execute_process(COMMAND ${_command}
