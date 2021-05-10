@@ -145,16 +145,24 @@ cleanup() {
 }
 
 cd ${BASE}
+echo "[+] Cleanup"
 cleanup
+echo "... Done"
 cd ${BASE}
-install_packages
+echo "[+] packages"
+install_packages_12
 cd ${BASE}
+echo "[+] z3"
 get_z3
 cd ${BASE}
+echo "[+] Afl"
 get_afl
 cd ${BASE}
+echo "[+] qsym"
 get_qsym
 cd ${BASE}
+echo "[+] symcc"
 install_symcc
 cd ${BASE}
-# install_libcxx
+echo "[+] libcxx"
+install_libcxx
