@@ -91,10 +91,6 @@ bool SymbolizePass::runOnFunction(Function &F) {
      return false;
   }
 
-
-  //FunctionPass *lower = createLowerSwitchPass();
-  //lower->runOnFunction(F); 
-
   DEBUG(errs() << "Symbolizing function ");
   DEBUG(errs().write_escaped(functionName) << '\n');
 
