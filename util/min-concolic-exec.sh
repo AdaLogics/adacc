@@ -142,6 +142,7 @@ while true; do
     if [ -n "$(ls -A $work_dir/cur)" ]; then
         echo "Generation $gen_count..."
 
+        cp -rf $work_dir/cur ${adir}/${gen_count}
         for f in $work_dir/cur/*; do
             echo "Running on $f"
             if [[ "$target " =~ " @@ " ]]; then
@@ -158,8 +159,10 @@ while true; do
             rm -f $f
             #rm -rf ${SYMCC_OUTPUT_DIR} && mkdir ${SYMCC_OUTPUT_DIR}
         done
-
+        
         rm -rf $work_dir/cur
+
+        #break
         gen_count=$((gen_count+1))
     else
         echo "No more inputs, breaking"
@@ -167,7 +170,7 @@ while true; do
         #rmdir $work_dir/cur
         #sleep 5
     fi
-
+ 
     echo "--- iteration" >> ${adir}/tmps-1.txt
     #cat ./corpus_counters.stats | grep "0" | wc -l >> ${adir}/tmps-1.txt
     echo ">>> Generation ${gen_count}" >> ${adir}/tmps-1.txt
@@ -177,6 +180,7 @@ while true; do
     #echo "Next dir: ${work_dir}/next"
     #ls -la ${work_dir}/next
     #sleep 4
+
 done
 
 echo "Completed execution"
