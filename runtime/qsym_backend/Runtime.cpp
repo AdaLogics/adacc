@@ -405,10 +405,14 @@ bool map_initialsed = false;
 bool prev_blocks_initialised = false;
 bool tracemaps_initialised = false;
 
-void _sym_push_path_constraint(SymExpr constraint, int taken,
+// 
+// Function for verifying if we should save the values
+// when pushing a path constraint.
+// Return false when no saving should be done.
+// Returns true when saving should be done.
+// 
+bool pure_concolic_should_save(SymExpr constraint, int taken,
                                uintptr_t site_id) {
-  if (constraint == nullptr)
-    return;
 
   // Handle the case where the counters have not yet
   // been initialised. 
@@ -562,8 +566,6 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   }
   if (should_save3) should_save = true;
 
-  
-
   // Am unsure if the stuff below should be necessary, since
   // we make the switch instructions verbose.
   // Ensure this is not a switch instruction.
@@ -591,6 +593,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
 
   std::cerr << "Taken " << taken << "\n";
   std::cerr << "Siteid " << site_id << " , Taken " << taken << "\n";
+
   // Hack to allow permanent solving. For debugging
   static bool force_check = false;
   if (force_check) {
@@ -604,10 +607,18 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     else {
         previosuly_blocked_a_save = true;
     }
-  //if (should_save) {
-      g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
-  //}
-  //std::cerr << "Finished push path constraint\n";
+
+  return should_save;
+}
+
+void _sym_push_path_constraint(SymExpr constraint, int taken,
+                               uintptr_t site_id) {
+  if (constraint == nullptr)
+    return;
+
+  
+  bool should_save = pure_concolic_should_save(constraint, taken, site_id);
+  g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
 }
 
 SymExpr _sym_get_input_byte(size_t offset) {
@@ -673,17 +684,18 @@ static int idx_hop = 0;
 
 void _symcc_cov_cb(uint32_t cb_id) {
     if (counter_map.count(cb_id) == 0) {
-//        curr_trace_map += cb_id + just_visited_bb;//(cb_id * idx_hop++);
-        // Counter is not in the map. So let's insert it.
+        // Insert the counter in the map.
         counter_map[cb_id] = 1;
-
-        curr_trace_map += cb_id;// + just_visited_bb;//(cb_id * idx_hop++);
         
+        // Increment our trace integer
+        curr_trace_map += cb_id;
+      
+        // Check if the counter is in the old map, and if not, save the values.
+        // This check is most likely no longer needed and also dubious of nature,
+        // so verify that this can be removed.
         if (old_counter_map.count(cb_id) == 0) {
             if (previosuly_blocked_a_save) {
-                printf("WE ARE NOW EXPLORING SOME NEW STUFF\n");
                 g_solver->checkAndSave("");
-//                previosuly_blocked_a_save=false;
             }
         }
     } else {
@@ -695,7 +707,6 @@ void _symcc_cov_cb(uint32_t cb_id) {
 //
 // Call-stack tracing
 //
-
 void _sym_notify_call(uintptr_t site_id) {
   g_call_stack_manager.visitCall(site_id);
 }
