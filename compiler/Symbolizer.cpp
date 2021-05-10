@@ -47,6 +47,7 @@ void Symbolizer::insertBasicBlockNotification(llvm::BasicBlock &B) {
 void Symbolizer::insertCovs(llvm::BasicBlock &B) {
   IRBuilder<> IRB(&*B.getFirstInsertionPt());
   std::vector<Value *> functionArgs2;
+  errs() << "Inserting cov feedback " << my_random_number << "\n";
   functionArgs2.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs2);
 }
@@ -908,7 +909,6 @@ Symbolizer::forceBuildRuntimeCall(IRBuilder<> &IRB, SymFnT function,
   for (const auto &[arg, symbolic] : args) {
     functionArgs.push_back(symbolic ? getSymbolicExpressionOrNull(arg) : arg);
   }
-  errs() << "Inside of force build runtime call " << my_random_number << "\n";
 
   auto *call = IRB.CreateCall(function, functionArgs);
   std::vector<Input> inputs;

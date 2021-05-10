@@ -121,8 +121,19 @@ bool SymbolizePass::runOnFunction(Function &F) {
 
   symbolizer.finalizePHINodes();
   symbolizer.shortCircuitExpressionUses();
+
+  // This inserts all of the code for pure concolic execution.
+  auto *pureConcolic= getenv("SYMCC_PC");
+  if (pureConcolic != nullptr) {
+    errs() << "We are instrumenting for pure concolic execution\n";
+      for (auto &basicBlock : F)
   for (auto &basicBlock : F)
     symbolizer.insertCovs(basicBlock);
+        symbolizer.insertCovs(basicBlock);
+  } else {
+    errs() << "We have no pure concolic execution\n";
+  }
+
 
   // DEBUG(errs() << F << '\n');
   assert(!verifyFunction(F, &errs()) &&
