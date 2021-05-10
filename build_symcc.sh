@@ -20,17 +20,7 @@ install_packages() {
     echo "[+] done installing packages"
 }
 
-get_deps() {
-	echo "[+] installing deps"
-	#git clone https://github.com/eurecom-s3/symcc
-	cd symcc/runtime/qsym_backend
-    git clone https://github.com/AdaLogics/qsym
-    cd qsym
-    git checkout adalogics
-    
-	#git submodule init
-	#git submodule update
-
+get_z3() {
     # Build Z3
     cd ${BASE}
     git clone -b z3-4.8.6 https://github.com/Z3Prover/z3.git
@@ -40,17 +30,33 @@ get_deps() {
     ninja
     sudo ninja install
 
-	# Build AFL.
-	cd ${BASE}
-	git clone -b v2.56b https://github.com/google/AFL.git afl \
-		&& cd afl \
-		&& make
+}
 
-	# Download the LLVM sources already so that we don't need to get them again when
-	# SymCC changes
-	cd ${BASE}
-	git clone -b llvmorg-10.0.1 --depth 1 https://github.com/llvm/llvm-project.git ./llvm_source
-	echo "[+] finished installing deps"
+get_afl() {
+    # Build AFL.
+    cd ${BASE}
+    git clone -b v2.56b https://github.com/google/AFL.git afl \
+        && cd afl \
+        && make
+
+    # Download the LLVM sources already so that we don't need to get them again when
+    # SymCC changes
+    cd ${BASE}
+    git clone -b llvmorg-10.0.1 --depth 1 https://github.com/llvm/llvm-project.git ./llvm_source
+    echo "[+] finished installing deps"
+}
+
+get_qsym() {
+	echo "[+] installing deps"
+	#git clone https://github.com/eurecom-s3/symcc
+    cd ${BASE}
+	cd symcc/runtime/qsym_backend
+    git clone https://github.com/AdaLogics/qsym
+    cd qsym
+    git checkout adalogics
+    
+	#git submodule init
+	#git submodule update
 }
 
 
@@ -75,7 +81,9 @@ install_symcc() {
 			../symcc 
     ninja check 
     cargo install --path ../symcc/util/symcc_fuzzing_helper
+}
 
+install_libcxx() {
     echo " installing libcxx"
     cd ${BASE}
 	rm -rf ./libcxx_native-symbolic
@@ -115,7 +123,17 @@ cleanup() {
     echo "[+] done cleaning up"
 }
 
+cd ${BASE}
 cleanup
-#install_packages
-get_deps
+cd ${BASE}
+install_packages
+cd ${BASE}
+#get_z3
+cd ${BASE}
+get_afl
+cd ${BASE}
+get_qsym
+cd ${BASE}
 install_symcc
+cd ${BASE}
+# install_libcxx
