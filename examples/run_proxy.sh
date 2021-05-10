@@ -1,6 +1,15 @@
 rm ./corpus_counters.stats
 touch ./corpus_counters.stats
 
+rm ./prev_1s.txt
+touch ./prev_1s.txt
+
+rm ./prev_0s.txt
+touch ./prev_0s.txt
+
+rm ./trace_maps.txt
+touch ./trace_maps.txt
+
 target=$@
 
 # Find the next work directory
@@ -16,6 +25,6 @@ then
 else 
     echo "input directory does not exist, creating ./inp"
     mkdir inp 
-    echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" >> inp/seed1
+    echo "ABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" >> inp/seed1
 fi
 ../util/min-concolic-exec.sh -i ./inp -a ./wdir-${val2} ${target} @@
