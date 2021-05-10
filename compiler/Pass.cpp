@@ -129,7 +129,6 @@ bool SymbolizePass::runOnFunction(Function &F) {
       for (auto &basicBlock : F)
   for (auto &basicBlock : F)
     symbolizer.insertCovs(basicBlock);
-        symbolizer.insertCovs(basicBlock);
   } else {
     errs() << "We have no pure concolic execution\n";
   }
