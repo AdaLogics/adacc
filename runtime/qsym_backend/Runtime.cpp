@@ -93,6 +93,15 @@ void deleteInputFile() {
 std::vector<unsigned int> counters;
 std::vector<unsigned int> new_counters;
 
+std::vector<uint32_t> takens_0;
+std::vector<uint32_t> takens_1;
+
+uint32_t curr_trace_map = 0;
+std::vector<uint32_t> trace_maps;
+
+bool previosuly_blocked_a_save = false;
+
+uint32_t just_visited_bb = 0;
 
 std::map<uint32_t, uint32_t> old_counter_map;
 std::map<uint32_t, uint32_t> counter_map;
@@ -189,8 +198,38 @@ void __dtor_runtime(void) {
 
         myfile.close();
  // }
+
+
+        ofstream myfile0;
+        myfile0.open ("prev_0s.txt", ios::trunc);
+      for (auto& it: takens_0) {
+          myfile0 << it << "\n";
+    //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
+      }
+        myfile0.close();
+
+        ofstream myfile1;
+        myfile1.open ("prev_1s.txt", ios::trunc);
+      for (auto& it: takens_1) {
+          myfile1 << it << "\n";
+    //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
+      }
+        myfile1.close();
+
+
+        ofstream myfile2;
+        myfile2.open ("trace_maps.txt", ios::trunc);
+      for (auto& it: trace_maps) {
+          myfile2 << it << "\n";
+    //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
+      }
+        myfile2.close();
+
+    
+
     std::cerr << "Done going through the counters\n";
 }
+
 
 void _sym_initialize(void) {
   if (g_initialized.test_and_set())
@@ -363,6 +402,8 @@ SymExpr _sym_build_trunc(SymExpr expr, uint8_t bits) {
 std::vector<uintptr_t> site_ids;
 
 bool map_initialsed = false;
+bool prev_blocks_initialised = false;
+bool tracemaps_initialised = false;
 
 void _sym_push_path_constraint(SymExpr constraint, int taken,
                                uintptr_t site_id) {
@@ -399,6 +440,35 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
 	  // std::cerr << "-----------\n";
         map_initialsed = true;
   }
+
+  if (!tracemaps_initialised) {
+      uint32_t cb_id = 0;
+    ifstream myfile("trace_maps.txt");
+    std::string line3;
+    while (std::getline(myfile, line3)) {
+        cb_id = (uint32_t)atol(line3.c_str());
+        trace_maps.push_back(cb_id);
+    }
+   tracemaps_initialised = true;
+  }
+
+  if (!prev_blocks_initialised) {
+      uint32_t cb_id = 0;
+    ifstream myfile("prev_0s.txt");
+    std::string line3;
+    while (std::getline(myfile, line3)) {
+        cb_id = (uint32_t)atol(line3.c_str());
+        takens_0.push_back(cb_id);
+    }
+
+    ifstream myfile1("prev_1s.txt");
+    std::string line4;
+    while (std::getline(myfile1, line4)) {
+        cb_id = (uint32_t)atol(line4.c_str());
+        takens_1.push_back(cb_id);
+    }
+    prev_blocks_initialised = true;
+  }
    
   // Now let's check if there is a difference in corpus
   bool should_save = false;
@@ -418,6 +488,81 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
       break;
     }
   }
+ 
+  // Now go through all of the branches we have solved so far. We must ensure
+  // we have a true/false for each "previous branch". This is what we 
+  // do right here.
+  bool should_save2 = false;
+  if (taken == 0 ) {
+    bool found_target = false;
+    for (auto &tb: takens_0) {
+      if (tb == just_visited_bb) {
+        found_target = true;
+      }
+    }
+    // if we didn't find the target, it means we must solve this one.
+    if (found_target == false) {
+        takens_0.push_back(just_visited_bb);
+        should_save2 = true;
+    }
+
+    // Let's also includel curr trace map in our takens
+    found_target = false;
+    for (auto &tb: takens_0) {
+      if (tb == curr_trace_map) {
+        found_target = true;
+      }
+    }
+    // if we didn't find the target, it means we must solve this one.
+    if (found_target == false) {
+        takens_0.push_back(curr_trace_map);
+        should_save2 = true;
+    }
+  } 
+  else {
+    bool found_target = false;
+    for (auto &tb: takens_1) {
+      if (tb == just_visited_bb) {
+        found_target = true;
+      }
+    }
+    // if we didn't find the target, it means we must solve this one.
+    if (found_target == false) {
+        takens_1.push_back(just_visited_bb);
+        should_save2 = true;
+    }
+
+    //  lets do tracemap as well.
+    found_target = false;
+    for (auto &tb: takens_1) {
+      if (tb == curr_trace_map) {
+        found_target = true;
+      }
+    }
+    // if we didn't find the target, it means we must solve this one.
+    if (found_target == false) {
+        takens_1.push_back(curr_trace_map);
+        should_save2 = true;
+    }
+  }
+
+  if (should_save2) should_save = true;
+
+  // Check if it is in the trace map
+  bool found_trace_map = false;
+  bool should_save3 = false;
+  for (auto &tmap: trace_maps) {
+    if (tmap == curr_trace_map) {
+      found_trace_map = true;
+    }
+  }
+  if (found_trace_map == false) {
+    trace_maps.push_back(curr_trace_map);
+    should_save3 = true;
+  }
+  if (should_save3) should_save = true;
+
+  
 
   // Am unsure if the stuff below should be necessary, since
   // we make the switch instructions verbose.
@@ -426,16 +571,16 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
   // We save the site_id for all should_saves. should_save will be
   // true the first time the switch is called, but false all other times. We
   // need to fix this.
-  //if (should_save == false) {
-  //  for (auto &sid : site_ids) {
-  //    if (sid == site_id) {
-  //      should_save = true;
-  //    }
-  //  }
-  //}
-  //if (should_save) {
-  //  site_ids.push_back(site_id);
-  //}
+  if (should_save == false) {
+    for (auto &sid : site_ids) {
+      if (sid == site_id) {
+        should_save = true;
+      }
+    }
+  }
+  if (should_save) {
+    site_ids.push_back(site_id);
+  }
 
   // Logging
   if (should_save) {
@@ -444,6 +589,8 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     std::cerr << "Should not save\n";
   }
 
+  std::cerr << "Taken " << taken << "\n";
+  std::cerr << "Siteid " << site_id << " , Taken " << taken << "\n";
   // Hack to allow permanent solving. For debugging
   static bool force_check = false;
   if (force_check) {
@@ -452,7 +599,11 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
 
   if (should_save) {
     std::cerr << "Saving\n";
+    previosuly_blocked_a_save = false;
   } 
+    else {
+        previosuly_blocked_a_save = true;
+    }
   //if (should_save) {
       g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
   //}
@@ -518,13 +669,27 @@ UNSUPPORTED(SymExpr _sym_build_float_to_unsigned_integer(SymExpr, uint8_t))
 #undef UNSUPPORTED
 #undef H
 
+static int idx_hop = 0;
+
 void _symcc_cov_cb(uint32_t cb_id) {
     if (counter_map.count(cb_id) == 0) {
+//        curr_trace_map += cb_id + just_visited_bb;//(cb_id * idx_hop++);
         // Counter is not in the map. So let's insert it.
         counter_map[cb_id] = 1;
+
+        curr_trace_map += cb_id;// + just_visited_bb;//(cb_id * idx_hop++);
+        
+        if (old_counter_map.count(cb_id) == 0) {
+            if (previosuly_blocked_a_save) {
+                printf("WE ARE NOW EXPLORING SOME NEW STUFF\n");
+                g_solver->checkAndSave("");
+//                previosuly_blocked_a_save=false;
+            }
+        }
     } else {
         counter_map[cb_id]++;
     }
+    just_visited_bb = cb_id;
 }
 
 //
