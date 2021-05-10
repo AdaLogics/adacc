@@ -40,6 +40,9 @@ struct Config {
   /// Do we prune expressions on hot paths?
   bool pruning = false;
 
+  // Is this pure concolic
+  bool is_pure_concolic = true;
+
   /// The AFL coverage map to initialize with.
   ///
   /// Specifying a file name here allows us to track already covered program

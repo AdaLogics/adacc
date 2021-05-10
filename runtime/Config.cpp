@@ -55,15 +55,19 @@ void loadConfig() {
 
   auto *exploredPathsFile = getenv("SYMCC_EXPLORED_PATHS");
   if (exploredPathsFile != nullptr) 
-      g_config.exploredPathsFile = exploredPathsFile;
+    g_config.exploredPathsFile = exploredPathsFile;
+
+  auto *isPureConcolic = getenv("SYMCC_PURE_CONCOLIC");
+  if (isPureConcolic != nullptr)
+    g_config.is_pure_concolic = checkFlagString(isPureConcolic);
 
   auto *legitFilesDir = getenv("SYMCC_LEGIT_FILES");
   if (legitFilesDir != nullptr)
-      g_config.legitFilesDir = legitFilesDir;
+    g_config.legitFilesDir = legitFilesDir;
 
   auto *pathModelsFiles = getenv("SYMCC_PATH_MODELS");
   if (pathModelsFiles != nullptr)
-      g_config.pathModelsFiles = pathModelsFiles;
+    g_config.pathModelsFiles = pathModelsFiles;
 
   auto *logFile = getenv("SYMCC_LOG_FILE");
   if (logFile != nullptr)

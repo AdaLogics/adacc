@@ -106,6 +106,8 @@ uint32_t just_visited_bb = 0;
 std::map<uint32_t, uint32_t> old_counter_map;
 std::map<uint32_t, uint32_t> counter_map;
 
+bool is_pure_concolic = true;
+
 
 /// A mapping of all expressions that we have ever received from Qsym to the
 /// corresponding shared pointers on the heap.
@@ -145,89 +147,91 @@ namespace fs = std::experimental::filesystem;
 static int dtor_done = 0;
 
 void __dtor_runtime(void) {
-    //std::cerr << "dtoring\n";
-    // A quick hack because we can have multiple calls to dtor
-    // due to our lazy implementation.
-    // This whole dtor should probably be substituted for atexit
-    if (dtor_done == 1) {
-        return;
-    }
-    dtor_done = 1;
+    if (is_pure_concolic) {
+        //std::cerr << "dtoring\n";
+        // A quick hack because we can have multiple calls to dtor
+        // due to our lazy implementation.
+        // This whole dtor should probably be substituted for atexit
+        if (dtor_done == 1) {
+            return;
+        }
+        dtor_done = 1;
 
-  // Now let's check if there is a difference in corpus
-  bool should_save = false;
-    std::cerr << "Inside of dtor, going through all counters\n";
-    
-    // Write the updated counters to our corpus file.
-    //
- 
-  std::cerr << "Preparing to write corpus counter\n";
+      // Now let's check if there is a difference in corpus
+      bool should_save = false;
+        std::cerr << "Inside of dtor, going through all counters\n";
+        
+        // Write the updated counters to our corpus file.
+        //
+     
+      std::cerr << "Preparing to write corpus counter\n";
 
-  bool has_had_change = false;
-	  for (auto& new_c: counter_map) {
-		uint32_t k,v;
-		k = new_c.first;
-		v = new_c.second;
-		if (old_counter_map.count(k) == 0) {
-          old_counter_map[k] = v;
-          has_had_change = true;
-		  //break;
-		}
-		if (old_counter_map.at(k) < v) {
-          old_counter_map[k] = v;
-          has_had_change = true;
-		  //break;
-		}
-	  }
-
-
-  //  std::cerr << "Counters we save:\n";
-  //for (auto& it: old_counter_map) {
-  //  std::cerr << "(" << it.first << ", " << it.second << ")\n";
-  //}
-  //  std::cerr << "-----------\n";
-
-  //if (has_had_change) {
-        ofstream myfile;
-        myfile.open ("corpus_counters.stats", ios::trunc);
-      for (auto& it: old_counter_map) {
-          myfile << it.first << "\n";
-          myfile << it.second << "\n";
-    //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
-      }
-
-        myfile.close();
- // }
+      bool has_had_change = false;
+          for (auto& new_c: counter_map) {
+            uint32_t k,v;
+            k = new_c.first;
+            v = new_c.second;
+            if (old_counter_map.count(k) == 0) {
+              old_counter_map[k] = v;
+              has_had_change = true;
+              //break;
+            }
+            if (old_counter_map.at(k) < v) {
+              old_counter_map[k] = v;
+              has_had_change = true;
+              //break;
+            }
+          }
 
 
-        ofstream myfile0;
-        myfile0.open ("prev_0s.txt", ios::trunc);
-      for (auto& it: takens_0) {
-          myfile0 << it << "\n";
-    //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
-      }
-        myfile0.close();
+      //  std::cerr << "Counters we save:\n";
+      //for (auto& it: old_counter_map) {
+      //  std::cerr << "(" << it.first << ", " << it.second << ")\n";
+      //}
+      //  std::cerr << "-----------\n";
 
-        ofstream myfile1;
-        myfile1.open ("prev_1s.txt", ios::trunc);
-      for (auto& it: takens_1) {
-          myfile1 << it << "\n";
-    //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
-      }
-        myfile1.close();
+      //if (has_had_change) {
+            ofstream myfile;
+            myfile.open ("corpus_counters.stats", ios::trunc);
+          for (auto& it: old_counter_map) {
+              myfile << it.first << "\n";
+              myfile << it.second << "\n";
+        //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
+          }
+
+            myfile.close();
+     // }
 
 
-        ofstream myfile2;
-        myfile2.open ("trace_maps.txt", ios::trunc);
-      for (auto& it: trace_maps) {
-          myfile2 << it << "\n";
-    //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
-      }
-        myfile2.close();
+            ofstream myfile0;
+            myfile0.open ("prev_0s.txt", ios::trunc);
+          for (auto& it: takens_0) {
+              myfile0 << it << "\n";
+        //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
+          }
+            myfile0.close();
 
-    
+            ofstream myfile1;
+            myfile1.open ("prev_1s.txt", ios::trunc);
+          for (auto& it: takens_1) {
+              myfile1 << it << "\n";
+        //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
+          }
+            myfile1.close();
 
-    std::cerr << "Done going through the counters\n";
+
+            ofstream myfile2;
+            myfile2.open ("trace_maps.txt", ios::trunc);
+          for (auto& it: trace_maps) {
+              myfile2 << it << "\n";
+        //    std::cerr << "(" << it.first << ", " << it.second << ")\n";
+          }
+            myfile2.close();
+
+        
+
+        std::cerr << "Done going through the counters\n";
+  }
 }
 
 
