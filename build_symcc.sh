@@ -1,6 +1,6 @@
 BASE=$PWD
 
-install_packages() {
+install_packages_10() {
     echo "[+] installing packages"
 	sudo apt-get update 
 	sudo apt-get install -y \
@@ -20,10 +20,31 @@ install_packages() {
     echo "[+] done installing packages"
 }
 
+install_packages_12() {
+    echo "[+] installing packages"
+    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+    echo "Updated repo "
+	sudo apt-get update 
+	sudo apt-get install -y \
+		        python2 \
+			cargo \
+			clang-12 \
+			cmake \
+			g++ \
+			git \
+			llvm-12-dev \
+			llvm-12-tools \
+			ninja-build \
+			python3-pip \
+			zlib1g-dev 
+	pip3 install lit
+    echo "[+] done installing packages"
+}
+
 get_z3() {
     # Build Z3
     cd ${BASE}
-    git clone -b z3-4.8.6 https://github.com/Z3Prover/z3.git
+    git clone -b z3-4.8.7 https://github.com/Z3Prover/z3.git
     mkdir z3/build 
     cd z3/build 
     cmake -G Ninja -DCMAKE_BUILD_TYPE=Release .. 
@@ -128,7 +149,7 @@ cleanup
 cd ${BASE}
 install_packages
 cd ${BASE}
-#get_z3
+get_z3
 cd ${BASE}
 get_afl
 cd ${BASE}
