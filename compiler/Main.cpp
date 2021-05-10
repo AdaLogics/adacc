@@ -20,11 +20,8 @@
 
 void addSymbolizePass(const llvm::PassManagerBuilder & /* unused */,
                       llvm::legacy::PassManagerBase &PM) {
+  // We do this only for pure concolic execution.
   PM.add(llvm::createLowerSwitchPass());
-        
-//          FunctionPass *lower = createLowerSwitchPass();
-  //          lower->runOnFunction(F);
-
   PM.add(new SymbolizePass());
 }
 
