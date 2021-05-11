@@ -27,6 +27,7 @@ install_packages_12() {
     echo "Updated repo "
 	apt-get update 
 	apt-get install -y \
+            python \
 			cargo \
 			cmake \
 			g++ \
