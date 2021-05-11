@@ -123,8 +123,8 @@ install_libcxx() {
 			 -DLLVM_TARGETS_TO_BUILD="X86" \
 			 -DCMAKE_BUILD_TYPE=Release \
 			 -DCMAKE_INSTALL_PREFIX=${BASE}/libcxx_native_build \
-			 -DCMAKE_C_COMPILER=${BASE}/symcc_build/symcc \
-			 -DCMAKE_CXX_COMPILER=${BASE}/symcc_build/sym++ \
+			 -DCMAKE_C_COMPILER=${BASE}/symcc_build_qsym/symcc \
+			 -DCMAKE_CXX_COMPILER=${BASE}/symcc_build_qsym/sym++ \
              -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON 
 
 	ninja distribution
@@ -165,4 +165,4 @@ echo "[+] symcc"
 install_symcc
 cd ${BASE}
 echo "[+] libcxx"
-install_libcxx
+#install_libcxx

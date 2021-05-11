@@ -106,7 +106,7 @@ uint32_t just_visited_bb = 0;
 std::map<uint32_t, uint32_t> old_counter_map;
 std::map<uint32_t, uint32_t> counter_map;
 
-bool is_pure_concolic = true;
+bool is_pure_concolic = false;
 
 
 /// A mapping of all expressions that we have ever received from Qsym to the
@@ -599,7 +599,7 @@ bool pure_concolic_should_save(SymExpr constraint, int taken,
   std::cerr << "Siteid " << site_id << " , Taken " << taken << "\n";
 
   // Hack to allow permanent solving. For debugging
-  static bool force_check = false;
+  static bool force_check = true;
   if (force_check) {
     should_save = true;
   }
@@ -621,7 +621,12 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
     return;
 
   
-  bool should_save = pure_concolic_should_save(constraint, taken, site_id);
+  bool should_save;
+  if (is_pure_concolic) {
+    should_save = pure_concolic_should_save(constraint, taken, site_id);
+  } else {
+    should_save = true;
+  }
   g_solver->addJcc(allocatedExpressions.at(constraint), taken != 0, site_id, should_save);
 }
 
