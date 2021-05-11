@@ -1,3 +1,4 @@
+export SYMCC_PURE_CONCOLIC=1
 rm ./corpus_counters.stats
 touch ./corpus_counters.stats
 

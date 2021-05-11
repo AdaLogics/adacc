@@ -41,7 +41,7 @@ struct Config {
   bool pruning = false;
 
   // Is this pure concolic
-  bool is_pure_concolic = true;
+  bool is_pure_concolic = false;
 
   /// The AFL coverage map to initialize with.
   ///
