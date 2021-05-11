@@ -2,8 +2,8 @@ BASE=$PWD
 
 install_packages_10() {
     echo "[+] installing packages"
-	sudo apt-get update 
-	sudo apt-get install -y \
+	apt-get update 
+	apt-get install -y \
 		        python2 \
 			cargo \
 			clang-10 \
@@ -22,18 +22,15 @@ install_packages_10() {
 
 install_packages_12() {
     echo "[+] installing packages"
-    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+    apt-get install wget
+    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key| apt-key add -
     echo "Updated repo "
-	sudo apt-get update 
-	sudo apt-get install -y \
-		        python2 \
+	apt-get update 
+	apt-get install -y \
 			cargo \
-			clang-12 \
 			cmake \
 			g++ \
 			git \
-			llvm-12-dev \
-			llvm-12-tools \
 			ninja-build \
 			python3-pip \
 			zlib1g-dev 
@@ -49,7 +46,7 @@ get_z3() {
     cd z3/build 
     cmake -G Ninja -DCMAKE_BUILD_TYPE=Release .. 
     ninja
-    sudo ninja install
+    ninja install
 
 }
 
@@ -79,7 +76,6 @@ get_qsym() {
 	#git submodule init
 	#git submodule update
 }
-
 
 install_symcc() {
 	echo "[+] installing SymCC"
@@ -135,12 +131,12 @@ install_libcxx() {
 
 cleanup() {
     echo "[+] cleaning up"
-    #sudo rm -rf ./afl
-    #sudo rm -rf ./libcxx_symcc
-    #sudo rm -rf ./llvm_source
-    sudo rm -rf ./libcxx_symcc_install
-    sudo rm -rf ./symcc_build
-    sudo rm -rf ./symcc_build_qsym
+    #rm -rf ./afl
+    #rm -rf ./libcxx_symcc
+    #rm -rf ./llvm_source
+    rm -rf ./libcxx_symcc_install
+    rm -rf ./symcc_build
+    rm -rf ./symcc_build_qsym
     echo "[+] done cleaning up"
 }
 
@@ -150,10 +146,10 @@ cleanup
 echo "... Done"
 cd ${BASE}
 echo "[+] packages"
-#install_packages_12
+install_packages_12
 cd ${BASE}
 echo "[+] z3"
-#get_z3
+get_z3
 cd ${BASE}
 echo "[+] Afl"
 get_afl
