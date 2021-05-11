@@ -16,11 +16,26 @@ cmake_minimum_required(VERSION 3.5)
 project(SymRuntime)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wc++17-extensions \
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  \
--Wredundant-decls -Wcast-align \
--Wmissing-include-dirs -Wswitch-default \
--Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \
--Wmissing-format-attribute -Wformat-nonliteral")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -std=c++17 \
+#-Wredundant-decls -Wcast-align \
+#-Wmissing-include-dirs -Wswitch-default \
+#-Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \
+#-Wmissing-format-attribute -Wformat-nonliteral")
+
+EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE clang_full_version_string )
+string (REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION_STRING ${clang_full_version_string})
+if (CLANG_VERSION_STRING VERSION_GREATER 11.0)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wc++17-extensions 
+    -Wredundant-decls -Wcast-align -Wmissing-include-dirs -Wswitch-default \
+    -Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \
+    -Wmissing-format-attribute -Wformat-nonliteral ")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 \
+    -Wredundant-decls -Wcast-align -Wmissing-include-dirs -Wswitch-default \
+    -Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \
+    -Wmissing-format-attribute -Wformat-nonliteral ")
+endif()
+
 
 option(QSYM_BACKEND "Use the Qsym backend instead of our own" OFF)
 option(Z3_TRUST_SYSTEM_VERSION "Use the system-provided Z3 without a version check" OFF)

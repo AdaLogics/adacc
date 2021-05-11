@@ -184,11 +184,21 @@ add_definitions(${LLVM_DEFINITIONS})
 include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 \
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wc++17-extensions \
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 \
--Wredundant-decls -Wcast-align -Wmissing-include-dirs -Wswitch-default \
--Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \
--Wmissing-format-attribute -Wformat-nonliteral ")
+EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE clang_full_version_string )
+string (REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION_STRING ${clang_full_version_string})
+if (CLANG_VERSION_STRING VERSION_GREATER 11.0)
+    message("clang version is larger than 11. Using -Wc++17-extensions")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wc++17-extensions 
+    -Wredundant-decls -Wcast-align -Wmissing-include-dirs -Wswitch-default \
+    -Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \
+    -Wmissing-format-attribute -Wformat-nonliteral ")
+else()
+    message("clang version is not larger than 11. using -std=c++17")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 \
+    -Wredundant-decls -Wcast-align -Wmissing-include-dirs -Wswitch-default \
+    -Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \
+    -Wmissing-format-attribute -Wformat-nonliteral ")
+endif()
 
 # Mark nodelete to work around unload bug in upstream LLVM 5.0+
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-z,nodelete")
