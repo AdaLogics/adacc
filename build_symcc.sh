@@ -165,4 +165,4 @@ echo "[+] symcc"
 install_symcc
 cd ${BASE}
 echo "[+] libcxx"
-#install_libcxx
+install_libcxx
