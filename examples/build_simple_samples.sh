@@ -1,4 +1,4 @@
-
+export SYMCC_PC=1
 #SYMCC_REGULAR_LIBCXX=1 symcc -fsanitize-coverage=trace-pc-guard ./simple-example.c -o simple-example
 #SYMCC_REGULAR_LIBCXX=1 symcc -fsanitize-coverage=inline-8bit-counters ./simple-example.c -o simple-example
 #SYMCC_REGULAR_LIBCXX=1 sym++ ./simple-example.c -o simple-example

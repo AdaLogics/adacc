@@ -1,3 +1,5 @@
+export SYMCC_PC=1
+
 git clone https://github.com/nodejs/http-parser
 cd http-parser
 SYMCC_REGULAR_LIBCXX=1 symcc -c -I./ ./fuzzers/fuzz_url.c -o fuzz_url.o 
