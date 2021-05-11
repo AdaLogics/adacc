@@ -188,7 +188,7 @@ EXECUTE_PROCESS( COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE clang_f
 string (REGEX REPLACE ".*clang version ([0-9]+\\.[0-9]+).*" "\\1" CLANG_VERSION_STRING ${clang_full_version_string})
 if (CLANG_VERSION_STRING VERSION_GREATER 11.0)
     message("clang version is larger than 11. Using -Wc++17-extensions")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wc++17-extensions 
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wc++17-extensions  \
     -Wredundant-decls -Wcast-align -Wmissing-include-dirs -Wswitch-default \
     -Wextra -Wall -Winvalid-pch -Wredundant-decls -Wformat=2 \
     -Wmissing-format-attribute -Wformat-nonliteral ")

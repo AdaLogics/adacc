@@ -84,13 +84,13 @@ get_qsym() {
 install_symcc() {
 	echo "[+] installing SymCC"
 	# Build a version of SymCC with the simple backend to compile libc++
-	mkdir symcc_build
-	cd symcc_build
-	cmake -G Ninja \
-			-DQSYM_BACKEND=OFF \
-			-DCMAKE_BUILD_TYPE=RelWithDebInfo -DZ3_TRUST_SYSTEM_VERSION=on \
-			../symcc
-    ninja check
+	#mkdir symcc_build
+	#cd symcc_build
+	#cmake -G Ninja \
+#			-DQSYM_BACKEND=OFF \
+#			-DCMAKE_BUILD_TYPE=RelWithDebInfo -DZ3_TRUST_SYSTEM_VERSION=on \
+#			../symcc
+#    ninja check
 
 	# Build SymCC with the Qsym backend
 	cd ${BASE}
@@ -150,10 +150,10 @@ cleanup
 echo "... Done"
 cd ${BASE}
 echo "[+] packages"
-install_packages_12
+#install_packages_12
 cd ${BASE}
 echo "[+] z3"
-get_z3
+#get_z3
 cd ${BASE}
 echo "[+] Afl"
 get_afl
