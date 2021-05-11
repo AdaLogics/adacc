@@ -106,7 +106,7 @@ uint32_t just_visited_bb = 0;
 std::map<uint32_t, uint32_t> old_counter_map;
 std::map<uint32_t, uint32_t> counter_map;
 
-bool is_pure_concolic = false;
+//bool is_pure_concolic = false;
 
 
 /// A mapping of all expressions that we have ever received from Qsym to the
@@ -147,7 +147,7 @@ namespace fs = std::experimental::filesystem;
 static int dtor_done = 0;
 
 void __dtor_runtime(void) {
-    if (is_pure_concolic) {
+    if (g_config.is_pure_concolic) {
         //std::cerr << "dtoring\n";
         // A quick hack because we can have multiple calls to dtor
         // due to our lazy implementation.
@@ -622,7 +622,7 @@ void _sym_push_path_constraint(SymExpr constraint, int taken,
 
   
   bool should_save;
-  if (is_pure_concolic) {
+  if (g_config.is_pure_concolic) {
     should_save = pure_concolic_should_save(constraint, taken, site_id);
   } else {
     should_save = true;
