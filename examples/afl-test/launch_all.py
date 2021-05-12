@@ -7,7 +7,8 @@ import subprocess
 
 afl_dir="/home/dav/code/symcc-fork-4/afl"
 symcc_dir="/home/dav/code/symcc-fork-4/symcc_build_qsym"
-symcc_fuzzing_helper="/home/dav/.cargo/bin/symcc_fuzzing_helper"
+#symcc_fuzzing_helper="/home/dav/.cargo/bin/symcc_fuzzing_helper"
+symcc_fuzzing_helper="./symcc_fuzzing_helper"
 
 def input_setup():
     if os.path.isdir("corpus"):
@@ -89,6 +90,13 @@ def run_all(afl_target, symcc_target):
 
 if __name__ == "__main__":
     input_setup()
-    build_all("./afl-test.c")
-    run_all("./afl-compiled", "./symcc-compiled")
+    if len(sys.argv) == 3:
+        afl_target = sys.argv[1]
+        symcc_target = sys.argv[2]
+        print("afl-target: %s"%(afl_target))
+        print("symcc-target: %s"%(symcc_target))
+        run_all(afl_target, symcc_target)
+    else:
+        build_all("./afl-test.c")
+        run_all("./afl-compiled", "./symcc-compiled")
     
