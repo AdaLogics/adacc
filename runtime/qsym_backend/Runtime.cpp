@@ -599,7 +599,7 @@ bool pure_concolic_should_save(SymExpr constraint, int taken,
   std::cerr << "Siteid " << site_id << " , Taken " << taken << "\n";
 
   // Hack to allow permanent solving. For debugging
-  static bool force_check = true;
+  static bool force_check = false;
   if (force_check) {
     should_save = true;
   }
