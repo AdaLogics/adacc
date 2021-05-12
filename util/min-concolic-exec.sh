@@ -34,11 +34,29 @@ shift $((OPTIND-1))
 target=$@
 timeout="timeout -k 5 90"
 
+
 if [[ ! -v in ]]; then
     echo "Please specify the input directory!"
     usage
     exit 1
 fi
+
+# Using this script we are interested in concolic execution, so set the variable
+export SYMCC_PURE_CONCOLIC=1
+
+# Some tmp files used by symcc to monitor progress. Refrese these files.
+rm ./corpus_counters.stats
+touch ./corpus_counters.stats
+
+rm ./prev_1s.txt
+touch ./prev_1s.txt
+
+rm ./prev_0s.txt
+touch ./prev_0s.txt
+
+rm ./trace_maps.txt
+touch ./trace_maps.txt
+
 
 # Create the work environment
 work_dir=$(mktemp -d)
