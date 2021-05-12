@@ -126,10 +126,11 @@ bool SymbolizePass::runOnFunction(Function &F) {
   auto *pureConcolic= getenv("SYMCC_PC");
   if (pureConcolic != nullptr) {
     errs() << "We are instrumenting for pure concolic execution\n";
-      for (auto &basicBlock : F)
-  for (auto &basicBlock : F)
-    symbolizer.insertCovs(basicBlock);
-  } else {
+    for (auto &basicBlock : F) {
+        symbolizer.insertCovs(basicBlock);
+    }
+  } 
+  else {
     errs() << "We have no pure concolic execution\n";
   }
 
