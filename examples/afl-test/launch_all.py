@@ -7,7 +7,7 @@ import subprocess
 
 afl_dir="/home/dav/code/symcc-fork-4/afl"
 symcc_dir="/home/dav/code/symcc-fork-4/symcc_build_qsym"
-
+symcc_fuzzing_helper="/home/dav/.cargo/bin/symcc_fuzzing_helper"
 
 def input_setup():
     if os.path.isdir("corpus"):
@@ -58,7 +58,7 @@ def afl_worker_secondary(afl_target):
 def symcc_worker(symcc_target):
     the_env = os.environ
     the_env['PATH'] = the_env['PATH'] + ":%s"%(afl_dir)
-    symcc_cmd = ["/home/dav/.cargo/bin/symcc_fuzzing_helper", 
+    symcc_cmd = [symcc_fuzzing_helper,
                  "-o", "afl-out", 
                  "-a", "afl-secondary", 
                  "-n", "symcc", 
