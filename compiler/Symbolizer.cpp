@@ -383,7 +383,7 @@ void Symbolizer::visitSelectInst(SelectInst &I) {
   // expression over from the chosen argument.
 
   IRBuilder<> IRB(&I);
-  errs() << "Inserting the instruction\n";
+  //errs() << "Inserting the instruction\n";
   auto runtimeCall = buildRuntimeCall(IRB, runtime.pushPathConstraint,
                                       {{I.getCondition(), true},
                                        {I.getCondition(), false},
