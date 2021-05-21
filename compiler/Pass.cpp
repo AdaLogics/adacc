@@ -45,11 +45,11 @@ char SymbolizePass::ID = 0;
 bool SymbolizePass::doInitialization(Module &M) {
   DEBUG(errs() << "Symbolizer module init\n");
 
-  errs() << "Creating a random number now huh\n"; 
+  //errs() << "Creating a random number now huh\n"; 
   srand(time(NULL));
   int isecret;
   isecret = rand() % 100000 + 1;
-  printf("Random number: %d\n", isecret);
+  //printf("Random number: %d\n", isecret);
 
 
   errs() << "Going through the symboliser \n";
@@ -58,7 +58,7 @@ bool SymbolizePass::doInitialization(Module &M) {
   // rename internal functions.
   for (auto &function : M.functions()) {
     auto name = function.getName();
-    errs() << "Getting function: " << name << "\n";
+    //errs() << "Getting function: " << name << "\n";
     if (isInterceptedFunction(function))
       function.setName(name + "_symbolized");
   }
@@ -102,7 +102,7 @@ bool SymbolizePass::runOnFunction(Function &F) {
   errs() << "Creating the symbolizer\n";
   Symbolizer symbolizer(*F.getParent());
   symbolizer.symbolizeFunctionArguments(F);
-  errs() << "My random number: " << symbolizer.my_random_number++ << "\n";
+  //errs() << "My random number: " << symbolizer.my_random_number++ << "\n";
 
 
   
@@ -110,7 +110,7 @@ bool SymbolizePass::runOnFunction(Function &F) {
   std::mt19937 rng(dev());
   std::uniform_int_distribution<std::mt19937::result_type> dist6(1,1000000000);
 
-  errs() << "dist6 random number " << dist6(rng) << "\n";
+  //errs() << "dist6 random number " << dist6(rng) << "\n";
   symbolizer.my_random_number = dist6(rng);
   
   for (auto &basicBlock : F)
