@@ -43,6 +43,7 @@ using namespace llvm;
 char SymbolizePass::ID = 0;
 
 bool SymbolizePass::doInitialization(Module &M) {
+  errs() << "Symbolizer module init\n";
   DEBUG(errs() << "Symbolizer module init\n");
 
   //errs() << "Creating a random number now huh\n"; 
@@ -99,7 +100,7 @@ bool SymbolizePass::runOnFunction(Function &F) {
   for (auto &I : instructions(F))
     allInstructions.push_back(&I);
 
-  errs() << "Creating the symbolizer\n";
+  //errs() << "Creating the symbolizer\n";
   Symbolizer symbolizer(*F.getParent());
   symbolizer.symbolizeFunctionArguments(F);
   //errs() << "My random number: " << symbolizer.my_random_number++ << "\n";
@@ -130,9 +131,9 @@ bool SymbolizePass::runOnFunction(Function &F) {
         symbolizer.insertCovs(basicBlock);
     }
   } 
-  else {
-    errs() << "We have no pure concolic execution\n";
-  }
+  //else {
+  //  errs() << "We have no pure concolic execution\n";
+  //}
 
 
   // DEBUG(errs() << F << '\n');
