@@ -70,7 +70,7 @@ fi
 echo "stdlib_cflags: ${stdlib_cflags}" 
 echo "stdlib_ldflags: ${stdlib_ldflags}" 
 
-exec $compiler -v                                 \
+exec $compiler                                  \
      -Xclang -load -Xclang "$pass"              \
      $stdlib_cflags                             \
      "$@"                                       \

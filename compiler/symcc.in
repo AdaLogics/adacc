@@ -39,7 +39,7 @@ if [ $# -eq 0 ]; then
 fi
 
      #-fsanitize-coverage="inline-8bit-counters" \
-exec $compiler -v                                 \
+exec $compiler                                  \
      -Xclang -load -Xclang "$pass"              \
      "$@"                                       \
      -L"$runtime_dir"                           \
