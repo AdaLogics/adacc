@@ -233,6 +233,7 @@ void __dtor_runtime(void) {
 
         std::cerr << "Done going through the counters\n";
   }
+    exit(0);
 }
 
 
