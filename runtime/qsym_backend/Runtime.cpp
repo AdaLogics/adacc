@@ -694,7 +694,7 @@ UNSUPPORTED(SymExpr _sym_build_float_to_unsigned_integer(SymExpr, uint8_t))
 static int idx_hop = 0;
 
 void _symcc_cov_cb(uint32_t cb_id) {
-std::cerr << "symcc_cov_cb\n":
+std::cerr << "symcc_cov_cb\n";
     if (counter_map.count(cb_id) == 0) {
         // Insert the counter in the map.
         counter_map[cb_id] = 1;
