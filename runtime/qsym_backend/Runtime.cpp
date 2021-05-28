@@ -147,6 +147,7 @@ namespace fs = std::experimental::filesystem;
 static int dtor_done = 0;
 
 void __dtor_runtime(void) {
+    //std::cerr << "finished exection, going into dtor\n";
     if (g_config.is_pure_concolic) {
         //std::cerr << "dtoring\n";
         // A quick hack because we can have multiple calls to dtor
@@ -232,6 +233,7 @@ void __dtor_runtime(void) {
 
         std::cerr << "Done going through the counters\n";
   }
+    exit(0);
 }
 
 
@@ -617,6 +619,7 @@ bool pure_concolic_should_save(SymExpr constraint, int taken,
 
 void _sym_push_path_constraint(SymExpr constraint, int taken,
                                uintptr_t site_id) {
+  //std::cerr << "pushing path constraint\n";
   if (constraint == nullptr)
     return;
 
@@ -692,6 +695,7 @@ UNSUPPORTED(SymExpr _sym_build_float_to_unsigned_integer(SymExpr, uint8_t))
 static int idx_hop = 0;
 
 void _symcc_cov_cb(uint32_t cb_id) {
+//std::cerr << "symcc_cov_cb\n";
     if (counter_map.count(cb_id) == 0) {
         // Insert the counter in the map.
         counter_map[cb_id] = 1;
@@ -759,8 +763,10 @@ bool _sym_feasible(SymExpr expr) {
 //
 
 void _sym_collect_garbage() {
+  //std::cerr << "collect garbage 1\n";
   if (allocatedExpressions.size() < g_config.garbageCollectionThreshold)
     return;
+  //std::cerr << "collect garbage 2\n";
 
 #ifdef DEBUG_RUNTIME
   auto start = std::chrono::high_resolution_clock::now();
@@ -775,6 +781,7 @@ void _sym_collect_garbage() {
       ++expr_it;
     }
   }
+  //std::cerr << "collect garbage 3\n";
 
 #ifdef DEBUG_RUNTIME
   auto end = std::chrono::high_resolution_clock::now();
@@ -787,4 +794,5 @@ void _sym_collect_garbage() {
                    .count()
             << " milliseconds)" << std::endl;
 #endif
+  //std::cerr << "collect garbage 4\n";
 }
