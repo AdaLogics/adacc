@@ -84,12 +84,18 @@ impl AflMap {
             interesting = true;
         }
         else {
+            let mut data_counter = 0;
+            let mut diffs = 0;
             for (known, new) in self.data.iter_mut().zip(other.data.iter()) {
+                data_counter += 1;
                 if *known != (*known | new) {
+                    diffs += 1;
                     *known |= new;
                     interesting = true;
                 }
             }
+            println!("Data counter: {dc}", dc=data_counter);
+            println!("Diffs: {di}", di=diffs);
         }
         if interesting {
             println!("is interesting");
