@@ -323,7 +323,7 @@ fn main() -> Result<()> {
         {
             None => {
                 log::debug!("Waiting for new test cases...");
-                thread::sleep(Duration::from_secs(5));
+                thread::sleep(Duration::from_secs(30));
             }
             Some(input) => state.test_input(&input, &symcc, &afl_config, options.dont_use_showmap)?,
         }
