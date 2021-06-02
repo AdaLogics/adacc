@@ -91,6 +91,12 @@ impl AflMap {
                 }
             }
         }
+        if interesting {
+            println!("is interesting");
+        }
+        else {
+            println!("Is not interesting");
+        }
         interesting
     }
 }
