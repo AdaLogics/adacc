@@ -232,12 +232,12 @@ impl State {
             .run(&input, tmp_dir.path().join("output"))
             .context("Failed to run SymCC")?;
         for new_test in symcc_result.test_cases.iter() {
-            let res = process_new_testcase(&new_test, &input, &tmp_dir, &afl_config, self)?;
-
-            num_total += 1;
-            if res == TestcaseResult::New {
-                log::debug!("Test case is interesting");
-                num_interesting += 1;
+            if let Ok(res) = process_new_testcase(&new_test, &input, &tmp_dir, &afl_config, self){
+                num_total += 1;
+                if res == TestcaseResult::New {
+                    log::debug!("Test case is interesting");
+                    num_interesting += 1;
+                }
             }
         }
 

@@ -42,13 +42,15 @@ fn insert_input_file<S: AsRef<OsStr>, P: AsRef<Path>>(
 
 /// A coverage map as used by AFL.
 pub struct AflMap {
-    data: [u8; 65536],
+    //data: [u8; 65536],
+    data: Vec<u8>
 }
 
 impl AflMap {
     /// Create an empty map.
     pub fn new() -> AflMap {
-        AflMap { data: [0; 65536] }
+        //AflMap { data: [0; 65536] }
+        AflMap { data: Vec::new() }
     }
 
     /// Load a map from disk.
@@ -60,14 +62,8 @@ impl AflMap {
                 path.as_ref().display()
             )
         })?;
-        ensure!(
-            data.len() == 65536,
-            "The file to load the coverage map from has the wrong size ({})",
-            data.len()
-        );
-
         let mut result = AflMap::new();
-        result.data.copy_from_slice(&data);
+        result.data = data;
         Ok(result)
     }
 
@@ -77,13 +73,24 @@ impl AflMap {
     /// coverage.
     pub fn merge(&mut self, other: &AflMap) -> bool {
         let mut interesting = false;
-        for (known, new) in self.data.iter_mut().zip(other.data.iter()) {
-            if *known != (*known | new) {
-                *known |= new;
-                interesting = true;
+        //println!("Merging");
+        //println!("Size of data: {si}", si=self.data.len());
+        //println!("Size of other data: {si}", si=other.data.len());
+        // The first time merge is called self.data will be empty.
+        // Thus in that case we simply clone the other vector.
+        if self.data.len() == 0 {
+            //println!("own data is zero");
+            self.data = other.data.clone();
+            interesting = true;
+        }
+        else {
+            for (known, new) in self.data.iter_mut().zip(other.data.iter()) {
+                if *known != (*known | new) {
+                    *known |= new;
+                    interesting = true;
+                }
             }
         }
-
         interesting
     }
 }
@@ -328,11 +335,9 @@ impl AflConfig {
         testcase: impl AsRef<Path>,
     ) -> Result<AflShowmapResult> {
         let mut afl_show_map = Command::new(&self.show_map);
-
         if self.use_qemu_mode {
             afl_show_map.arg("-Q");
         }
-
         afl_show_map
             .args(&["-t", "5000", "-m", "none", "-b", "-o"])
             .arg(testcase_bitmap.as_ref())
