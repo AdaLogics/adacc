@@ -85,7 +85,8 @@ std::atomic_flag g_initialized = ATOMIC_FLAG_INIT;
 std::string inputFileName;
 
 void deleteInputFile() { 
-    std::cout << " in delete input file\n";
+    if (g_config.silent == false)
+      std::cout << " in delete input file\n";
     std::remove(inputFileName.c_str()); 
 }
 
@@ -160,12 +161,14 @@ void __dtor_runtime(void) {
 
       // Now let's check if there is a difference in corpus
       bool should_save = false;
+        if (g_config.silent == false)
         std::cerr << "Inside of dtor, going through all counters\n";
         
         // Write the updated counters to our corpus file.
         //
      
-      std::cerr << "Preparing to write corpus counter\n";
+      if (g_config.silent == false)
+        std::cerr << "Preparing to write corpus counter\n";
 
       bool has_had_change = false;
           for (auto& new_c: counter_map) {
@@ -231,7 +234,8 @@ void __dtor_runtime(void) {
 
         
 
-        std::cerr << "Done going through the counters\n";
+        if (g_config.silent == false)
+          std::cerr << "Done going through the counters\n";
   }
     exit(0);
 }
@@ -243,12 +247,14 @@ void _sym_initialize(void) {
 
   loadConfig();
   initLibcWrappers();
-  std::cerr << "This is SymCC running with the QSYM backend" << std::endl;
-  if (g_config.fullyConcrete) {
-    std::cerr
-        << "Performing fully concrete execution (i.e., without symbolic input)"
-        << std::endl;
-    return;
+  if (g_config.silent == false) {
+    std::cerr << "This is SymCC running with the QSYM backend" << std::endl;
+    if (g_config.fullyConcrete) {
+      std::cerr
+          << "Performing fully concrete execution (i.e., without symbolic input)"
+          << std::endl;
+      return;
+    }
   }
 
   // Check the output directory
@@ -263,8 +269,9 @@ void _sym_initialize(void) {
 */
   // Qsym requires the full input in a file
   if (g_config.inputFile.empty()) {
-    std::cerr << "Reading program input until EOF (use Ctrl+D in a terminal)..."
-              << std::endl;
+    if (g_config.silent == false)
+      std::cerr << "Reading program input until EOF (use Ctrl+D in a terminal)..."
+                << std::endl;
     std::istreambuf_iterator<char> in_begin(std::cin), in_end;
     std::vector<char> inputData(in_begin, in_end);
     inputFileName = std::tmpnam(nullptr);
@@ -274,10 +281,12 @@ void _sym_initialize(void) {
     inputFile.close();
 
 #ifdef DEBUG_RUNTIME
-    std::cerr << "Loaded input:" << std::endl;
+    if (g_config.silent == false)
+      std::cerr << "Loaded input:" << std::endl;
     std::copy(inputData.begin(), inputData.end(),
               std::ostreambuf_iterator<char>(std::cerr));
-    std::cerr << std::endl;
+    if (g_config.silent == false)
+      std::cerr << std::endl;
 #endif
 
     atexit(deleteInputFile);
@@ -290,8 +299,9 @@ void _sym_initialize(void) {
     }
   } else {
     inputFileName = g_config.inputFile;
-    std::cerr << "Making data read from " << inputFileName << " as symbolic"
-              << std::endl;
+    if (g_config.silent == false)
+      std::cerr << "Making data read from " << inputFileName << " as symbolic"
+                << std::endl;
   }
 
   g_z3_context = new z3::context{};
@@ -489,7 +499,8 @@ bool pure_concolic_should_save(SymExpr constraint, int taken,
     k = new_c.first;
     v = new_c.second;
     if (old_counter_map.count(k) == 0) {
-      std::cerr << "Found counter not in old map " << k << "\n";
+      if (g_config.silent == false)
+        std::cerr << "Found counter not in old map " << k << "\n";
       should_save = true;
       break;
     } 
@@ -592,13 +603,17 @@ bool pure_concolic_should_save(SymExpr constraint, int taken,
 
   // Logging
   if (should_save) {
-    std::cerr << "Should save\n";
+    if (g_config.silent == false)
+      std::cerr << "Should save\n";
   } else {
-    std::cerr << "Should not save\n";
+    if (g_config.silent == false)
+      std::cerr << "Should not save\n";
   }
 
-  std::cerr << "Taken " << taken << "\n";
-  std::cerr << "Siteid " << site_id << " , Taken " << taken << "\n";
+  if (g_config.silent == false) {
+    std::cerr << "Taken " << taken << "\n";
+    std::cerr << "Siteid " << site_id << " , Taken " << taken << "\n";
+  }
 
   // Hack to allow permanent solving. For debugging
   static bool force_check = false;
@@ -607,7 +622,8 @@ bool pure_concolic_should_save(SymExpr constraint, int taken,
   }
 
   if (should_save) {
-    std::cerr << "Saving\n";
+    if (g_config.silent == false)
+      std::cerr << "Saving\n";
     previosuly_blocked_a_save = false;
   } 
     else {
@@ -786,13 +802,14 @@ void _sym_collect_garbage() {
 #ifdef DEBUG_RUNTIME
   auto end = std::chrono::high_resolution_clock::now();
 
-  std::cerr << "After garbage collection: " << allocatedExpressions.size()
-            << " expressions remain" << std::endl
-            << "\t(collection took "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(end -
-                                                                     start)
-                   .count()
-            << " milliseconds)" << std::endl;
+  if (g_config.silent == false)
+    std::cerr << "After garbage collection: " << allocatedExpressions.size()
+              << " expressions remain" << std::endl
+              << "\t(collection took "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end -
+                                                                       start)
+                     .count()
+              << " milliseconds)" << std::endl;
 #endif
   //std::cerr << "collect garbage 4\n";
 }

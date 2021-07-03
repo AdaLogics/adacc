@@ -45,6 +45,10 @@ void loadConfig() {
   if (fullyConcrete != nullptr)
     g_config.fullyConcrete = checkFlagString(fullyConcrete);
 
+  auto *silent = getenv("SYMCC_SILENT");
+  if (silent != nullptr)
+    g_config.silent = true;
+
   auto *outputDir = getenv("SYMCC_OUTPUT_DIR");
   if (outputDir != nullptr)
     g_config.outputDir = outputDir;

@@ -18,6 +18,9 @@
 #include <string>
 
 struct Config {
+  /// do not print symcc output to stdout or stderr
+  bool silent = false;
+
   /// Should we allow symbolic data in the program?
   bool fullyConcrete = false;
 

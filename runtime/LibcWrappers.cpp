@@ -114,9 +114,10 @@ int SYM(open)(const char *path, int oflag, mode_t mode) {
   if (result >= 0 && !g_config.fullyConcrete && !g_config.inputFile.empty() &&
       strstr(path, g_config.inputFile.c_str()) != nullptr) {
     if (inputFileDescriptor != -1)
-      std::cerr << "Warning: input file opened multiple times; this is not yet "
-                   "supported"
-                << std::endl;
+      if (g_config.silent == false)
+        std::cerr << "Warning: input file opened multiple times; this is not yet "
+                     "supported"
+                  << std::endl;
     inputFileDescriptor = result;
     inputOffset = 0;
   }
@@ -197,9 +198,10 @@ FILE *SYM(fopen)(const char *pathname, const char *mode) {
       !g_config.inputFile.empty() &&
       strstr(pathname, g_config.inputFile.c_str()) != nullptr) {
     if (inputFileDescriptor != -1)
-      std::cerr << "Warning: input file opened multiple times; this is not yet "
-                   "supported"
-                << std::endl;
+      if (g_config.silent == false)
+        std::cerr << "Warning: input file opened multiple times; this is not yet "
+                     "supported"
+                  << std::endl;
     inputFileDescriptor = fileno(result);
     inputOffset = 0;
   }
@@ -215,9 +217,10 @@ FILE *SYM(fopen64)(const char *pathname, const char *mode) {
       !g_config.inputFile.empty() &&
       strstr(pathname, g_config.inputFile.c_str()) != nullptr) {
     if (inputFileDescriptor != -1)
-      std::cerr << "Warning: input file opened multiple times; this is not yet "
-                   "supported"
-                << std::endl;
+      if (g_config.silent == false)
+        std::cerr << "Warning: input file opened multiple times; this is not yet "
+                     "supported"
+                  << std::endl;
     inputFileDescriptor = fileno(result);
     inputOffset = 0;
   }
