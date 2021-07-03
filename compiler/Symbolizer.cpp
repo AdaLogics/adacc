@@ -47,7 +47,8 @@ void Symbolizer::insertBasicBlockNotification(llvm::BasicBlock &B) {
 void Symbolizer::insertCovs(llvm::BasicBlock &B) {
   IRBuilder<> IRB(&*B.getFirstInsertionPt());
   std::vector<Value *> functionArgs2;
-  errs() << "Inserting cov feedback " << my_random_number << "\n";
+  if (!getenv("SYMCC_SILENT"))
+    errs() << "Inserting cov feedback " << my_random_number << "\n";
   functionArgs2.push_back(IRB.getInt32(my_random_number++));
   IRB.CreateCall(runtime.cov_fun_callback, functionArgs2);
 }
@@ -272,16 +273,18 @@ void Symbolizer::handleIntrinsicCall(CallBase &I) {
     // Various bit-count operations. Expressing these symbolically is
     // difficult, so for now we just concretize.
 
-    errs() << "Warning: losing track of symbolic expressions at bit-count "
-              "operation "
-           << I << "\n";
+    if (!getenv("SYMCC_SILENT"))
+      errs() << "Warning: losing track of symbolic expressions at bit-count "
+                "operation "
+             << I << "\n";
     break;
   }
   case Intrinsic::returnaddress: {
     // Obtain the return address of the current function or one of its parents
     // on the stack. We just concretize.
 
-    errs() << "Warning: using concrete value for return address\n";
+    if (!getenv("SYMCC_SILENT"))
+      errs() << "Warning: using concrete value for return address\n";
     break;
   }
   case Intrinsic::bswap: {
@@ -293,7 +296,8 @@ void Symbolizer::handleIntrinsicCall(CallBase &I) {
     break;
   }
   default:
-    errs() << "Warning: unhandled LLVM intrinsic " << callee->getName()
+    if (!getenv("SYMCC_SILENT"))
+      errs() << "Warning: unhandled LLVM intrinsic " << callee->getName()
            << "; the result will be concretized\n";
     break;
   }
@@ -301,11 +305,13 @@ void Symbolizer::handleIntrinsicCall(CallBase &I) {
 
 void Symbolizer::handleInlineAssembly(CallInst &I) {
   if (I.getType()->isVoidTy()) {
-    errs() << "Warning: skipping over inline assembly " << I << '\n';
+    if (!getenv("SYMCC_SILENT"))
+      errs() << "Warning: skipping over inline assembly " << I << '\n';
     return;
   }
 
-  errs() << "Warning: losing track of symbolic expressions at inline assembly "
+  if (!getenv("SYMCC_SILENT"))
+    errs() << "Warning: losing track of symbolic expressions at inline assembly "
          << I << '\n';
 }
 
@@ -365,7 +371,8 @@ void Symbolizer::visitBinaryOperator(BinaryOperator &I) {
       handler = runtime.buildBoolXor;
       break;
     default:
-      errs() << "Can't handle Boolean operator " << I << '\n';
+      if (!getenv("SYMCC_SILENT"))
+        errs() << "Can't handle Boolean operator " << I << '\n';
       llvm_unreachable("Unknown Boolean operator");
       break;
     }
@@ -699,7 +706,8 @@ void Symbolizer::visitFPToUI(FPToUIInst &I) {
 void Symbolizer::visitCastInst(CastInst &I) {
   auto opcode = I.getOpcode();
   if (opcode != Instruction::SExt && opcode != Instruction::ZExt) {
-    errs() << "Warning: unhandled cast instruction " << I << '\n';
+    if (!getenv("SYMCC_SILENT"))
+      errs() << "Warning: unhandled cast instruction " << I << '\n';
     return;
   }
 
@@ -830,8 +838,9 @@ void Symbolizer::visitInstruction(Instruction &I) {
   if (isa<LandingPadInst>(I) || isa<ResumeInst>(I) || isa<InsertValueInst>(I))
     return;
 
-  errs() << "Warning: unknown instruction " << I
-         << "; the result will be concretized\n";
+  if (!getenv("SYMCC_SILENT"))
+    errs() << "Warning: unknown instruction " << I
+           << "; the result will be concretized\n";
 }
 
 CallInst *Symbolizer::createValueExpression(Value *V, IRBuilder<> &IRB) {

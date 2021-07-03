@@ -43,7 +43,8 @@ using namespace llvm;
 char SymbolizePass::ID = 0;
 
 bool SymbolizePass::doInitialization(Module &M) {
-  errs() << "Symbolizer module init\n";
+  if (!getenv("SYMCC_SILENT"))
+    errs() << "Symbolizer module init\n";
   DEBUG(errs() << "Symbolizer module init\n");
 
   //errs() << "Creating a random number now huh\n"; 
@@ -53,8 +54,10 @@ bool SymbolizePass::doInitialization(Module &M) {
   //printf("Random number: %d\n", isecret);
 
 
-  errs() << "Going through the symboliser \n";
-  errs() << "Analysing filename " << M.getSourceFileName() << "\n";
+  if (!getenv("SYMCC_SILENT"))
+    errs() << "Going through the symboliser \n";
+  if (!getenv("SYMCC_SILENT"))
+    errs() << "Analysing filename " << M.getSourceFileName() << "\n";
   // Redirect calls to external functions to the corresponding wrappers and
   // rename internal functions.
   for (auto &function : M.functions()) {
@@ -126,7 +129,8 @@ bool SymbolizePass::runOnFunction(Function &F) {
   // This inserts all of the code for pure concolic execution.
   auto *pureConcolic= getenv("SYMCC_PC");
   if (pureConcolic != nullptr) {
-    errs() << "We are instrumenting for pure concolic execution\n";
+    if (!getenv("SYMCC_SILENT"))
+      errs() << "We are instrumenting for pure concolic execution\n";
     for (auto &basicBlock : F) {
         symbolizer.insertCovs(basicBlock);
     }
