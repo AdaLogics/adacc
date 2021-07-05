@@ -307,6 +307,8 @@ void _sym_initialize(void) {
   g_z3_context = new z3::context{};
   g_solver =
       new Solver(inputFileName, g_config.outputDir, g_config.aflCoverageMap);
+
+  g_solver.setTimeout((int)(config.solverTimeout * 1000));
   g_expr_builder = g_config.pruning ? PruneExprBuilder::create()
                                     : SymbolicExprBuilder::create();
 }

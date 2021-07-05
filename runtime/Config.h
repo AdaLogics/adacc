@@ -24,6 +24,9 @@ struct Config {
   /// Should we allow symbolic data in the program?
   bool fullyConcrete = false;
 
+  /// Solver timeout, in seconds.
+  size_t solverTimeout = 10;
+
   /// The directory for storing new outputs.
   std::string outputDir = "/tmp/output";
 

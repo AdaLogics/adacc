@@ -49,6 +49,17 @@ void loadConfig() {
   if (silent != nullptr)
     g_config.silent = true;
 
+  auto *solverZ3Timeout = getenv("SOLVER_TIMEOUT");
+  if (solverZ3Timeout != nullptr) {
+    try {
+      g_config.solverTimeout = std::stoul(solverZ3Timeout);
+    } catch(std::invalid_argument &) {
+      std::stringstream msg;
+      msg << "Cant set solver timeout to a non integer\n";
+      throw std::runtime_error(msg.str());
+    }
+  }
+
   auto *outputDir = getenv("SYMCC_OUTPUT_DIR");
   if (outputDir != nullptr)
     g_config.outputDir = outputDir;
