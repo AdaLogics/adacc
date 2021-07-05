@@ -49,7 +49,7 @@ void loadConfig() {
   if (silent != nullptr)
     g_config.silent = true;
 
-  auto *solverZ3Timeout = getenv("SOLVER_TIMEOUT");
+  auto *solverZ3Timeout = getenv("SYMCC_SOLVER_TIMEOUT");
   if (solverZ3Timeout != nullptr) {
     try {
       g_config.solverTimeout = std::stoul(solverZ3Timeout);
